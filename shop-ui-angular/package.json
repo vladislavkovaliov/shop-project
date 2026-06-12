@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:shop-ui-angular": "node dist/shop-ui-angular/server/server.mjs"
+    "serve:ssr:shop-ui-angular": "node dist/shop-ui-angular/server/server.mjs",
+    "api": "dotenv -e .env -- sh -c 'npx swagger-typescript-api generate -p \"${PUBLIC_PROTOCOL}://${PUBLIC_URL}:${PUBLIC_PORT}/${PUBLIC_PATH}\" -o src/lib/types -n api.ts --no-client --extract-request-params --extract-response-body'"
   },
   "private": true,
   "packageManager": "npm@11.6.1",
@@ -33,6 +34,8 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "dotenv": "^17.4.2",
+    "dotenv-cli": "^11.0.0",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",

@@ -1,0 +1,111 @@
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-semibold text-zinc-900">Category Management</h1>
+    @if (isMock) {
+      <span class="mock-badge">Mock</span>
+    }
+  </div>
+  <button mat-flat-button color="primary" (click)="openCreateCategoryDialog()">
+    <mat-icon>add</mat-icon>
+    Create Category
+  </button>
+</div>
+
+<mat-tab-group [mat-stretch-tabs]="false" class="mb-6">
+  <mat-tab label="All Categories">
+    <div class="mt-4">
+      <table mat-table [dataSource]="categories" class="orders-table">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Category ID</th>
+          <td mat-cell *matCellDef="let c">{{ c.id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let c">{{ c.title }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="slug">
+          <th mat-header-cell *matHeaderCellDef>Slug</th>
+          <td mat-cell *matCellDef="let c">{{ c.slug }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="created">
+          <th mat-header-cell *matHeaderCellDef>Created</th>
+          <td mat-cell *matCellDef="let c">{{ c.createdAt }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <mat-paginator
+        [length]="totalCategories"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [hidePageSize]="true"
+        [showFirstLastButtons]="false"
+        (page)="onPage($event)"
+        class="orders-paginator"
+      />
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Category Stats">
+    <div class="mt-4 space-y-6">
+      <div class="grid grid-cols-3 gap-6">
+        @if (categoryStats) {
+          <app-stat-card label="Total Categories" [value]="categoryStats.totalCategories" [mock]="isMock" />
+          <app-stat-card label="Total Products" [value]="categoryStats.totalProducts" [mock]="isMock" />
+          <app-stat-card
+            label="Top Category"
+            [value]="categoryStats.topCategory.title + ' (' + formatCurrency(categoryStats.topCategory.revenue) + ')'"
+            [mock]="isMock"
+          />
+        }
+      </div>
+
+      <div>
+        <table mat-table [dataSource]="revenueData" class="orders-table">
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Category</th>
+            <td mat-cell *matCellDef="let s">{{ s.category }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="products">
+            <th mat-header-cell *matHeaderCellDef>Products</th>
+            <td mat-cell *matCellDef="let s">{{ s.products }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="revenue">
+            <th mat-header-cell *matHeaderCellDef>Revenue</th>
+            <td mat-cell *matCellDef="let s">{{ formatCurrency(s.revenue) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="orders">
+            <th mat-header-cell *matHeaderCellDef>Orders</th>
+            <td mat-cell *matCellDef="let s">{{ s.orders }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="growth">
+            <th mat-header-cell *matHeaderCellDef>Growth</th>
+            <td mat-cell *matCellDef="let s">{{ s.growth.sign }}{{ s.growth.value }}%</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="statsColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: statsColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="totalRevenue"
+          [pageSize]="statsPageSize"
+          [pageIndex]="statsPageIndex"
+          [hidePageSize]="true"
+          [showFirstLastButtons]="false"
+          (page)="onStatsPage($event)"
+          class="orders-paginator"
+        />
+      </div>
+    </div>
+  </mat-tab>
+</mat-tab-group>

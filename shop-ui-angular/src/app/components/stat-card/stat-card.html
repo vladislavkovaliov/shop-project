@@ -1,0 +1,23 @@
+<div class="bg-white border border-[#E5E7EB] rounded-lg p-6">
+  <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center gap-2">
+      @if (icon()) {
+        <mat-icon class="text-[#3b82f6]">{{ icon() }}</mat-icon>
+      }
+      <span class="text-sm text-zinc-500">{{ label() }}</span>
+      @if (mock()) {
+        <span class="text-[10px] uppercase tracking-wider font-bold text-green-600 bg-green-100 border border-green-400 rounded-sm px-1 leading-none">Mock</span>
+      }
+    </div>
+    @if (trend()) {
+      <span
+        [class.text-green-600]="trendUp()"
+        [class.text-red-600]="!trendUp()"
+        class="text-sm font-medium"
+      >
+        {{ trendUp() ? '↑' : '↓' }} {{ trend() }}
+      </span>
+    }
+  </div>
+  <p class="text-2xl font-semibold text-zinc-900">{{ value() }}</p>
+</div>

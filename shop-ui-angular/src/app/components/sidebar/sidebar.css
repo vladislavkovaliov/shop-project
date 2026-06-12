@@ -1,0 +1,14 @@
+a {
+  color: #71717a;
+}
+
+a:hover {
+  background: #f4f4f5;
+}
+
+a.active {
+  color: #3b82f6;
+  background: #f8fafc;
+  border-left: 2px solid #3b82f6;
+  padding-left: 22px;
+}

@@ -1,0 +1,18 @@
+# Built binaries
+tmp/
+/api
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# DB
+pgdata_backup

@@ -1,0 +1,120 @@
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-semibold text-zinc-900">Order Management</h1>
+    @if (ordersResource.isLoading()) {
+      <span class="text-xs text-zinc-400 italic">loading…</span>
+    } @else {
+      <span class="mock-badge">Mock</span>
+    }
+  </div>
+  <button mat-flat-button color="primary" (click)="openCreateOrderDialog()">
+    <mat-icon>add</mat-icon>
+    Create Order
+  </button>
+</div>
+
+<mat-tab-group [mat-stretch-tabs]="false" class="mb-6">
+  <mat-tab label="All Orders">
+    <div class="mt-4">
+      @if (ordersResource.isLoading()) {
+        <div class="flex items-center justify-center py-16 text-zinc-400">
+          Loading orders…
+        </div>
+      } @else if (ordersResource.error(); as err) {
+        <div class="flex flex-col items-center justify-center py-16 text-red-500">
+          <p>Failed to load orders</p>
+          <p class="text-sm text-zinc-400 mt-1">{{ err }}</p>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="ordersResource.value().items" class="orders-table">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Order ID</th>
+            <td mat-cell *matCellDef="let o">{{ o.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="userId">
+            <th mat-header-cell *matHeaderCellDef>User ID</th>
+            <td mat-cell *matCellDef="let o">{{ o.userId }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Created At</th>
+            <td mat-cell *matCellDef="let o">{{ o.createdAt }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="ordersResource.value().total"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [hidePageSize]="true"
+          [showFirstLastButtons]="false"
+          (page)="onPage($event)"
+          class="orders-paginator"
+        />
+      }
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Daily Purchases">
+    <div class="mt-4 space-y-6">
+      @if (statsResource.isLoading()) {
+        <div class="flex items-center justify-center py-8 text-zinc-400">
+          Loading stats…
+        </div>
+      } @else {
+        <div class="grid grid-cols-3 gap-6">
+          <app-stat-card label="Total This Month" [value]="formatCurrency(statsResource.value().totalThisMonth)" [mock]="false" />
+          <app-stat-card label="Average Check" [value]="formatCurrency(statsResource.value().averageCheck)" [mock]="false" />
+          <app-stat-card label="Active Orders" [value]="statsResource.value().activeOrders" [mock]="false" />
+        </div>
+      }
+
+      @if (dailyResource.isLoading()) {
+        <div class="flex items-center justify-center py-8 text-zinc-400">
+          Loading daily data…
+        </div>
+      } @else if (dailyResource.error(); as err) {
+        <div class="flex flex-col items-center justify-center py-8 text-red-500">
+          <p>Failed to load daily purchases</p>
+          <p class="text-sm text-zinc-400 mt-1">{{ err }}</p>
+        </div>
+      } @else {
+        <div>
+          <table mat-table [dataSource]="dailyResource.value().items" class="orders-table">
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let r">{{ formatDate(r.date) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="orders">
+              <th mat-header-cell *matHeaderCellDef>Orders</th>
+              <td mat-cell *matCellDef="let r">{{ r.orders }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="revenue">
+              <th mat-header-cell *matHeaderCellDef>Revenue</th>
+              <td mat-cell *matCellDef="let r">{{ formatCurrency(r.revenue) }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="dailyColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: dailyColumns"></tr>
+          </table>
+
+          <mat-paginator
+            [length]="dailyResource.value().total"
+            [pageSize]="dailyPageSize()"
+            [pageIndex]="dailyPageIndex()"
+            [hidePageSize]="true"
+            [showFirstLastButtons]="false"
+            (page)="onDailyPage($event)"
+            class="orders-paginator"
+          />
+        </div>
+      }
+    </div>
+  </mat-tab>
+</mat-tab-group>
