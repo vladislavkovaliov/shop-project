@@ -84,7 +84,3 @@ func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 	rg.GET("/users/by-most-expensive-product", h.ListUserByMostExpensiveProduct)
 
 }
-
-
-
-

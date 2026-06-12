@@ -141,15 +141,7 @@ func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*pro
 	return products, rows.Err()
 }
 
-func (r *PgxRepository) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRevenue, error) {
-	// rows, err := r.pool.Query(ctx, `
-	// 	SELECT p.title, SUM(p.price * oi.quantity) AS revenue
-	// 	FROM order_items oi
-	// 	JOIN products p ON p.id = oi.product_id
-	// 	GROUP BY p.id, p.title
-	// 	ORDER BY revenue DESC;
-	// `)
-
+func (r *PgxRepository) TotalRevenue(ctx context.Context, limit int, offset int) ([]*proddomain.TotalRevenue, error) {
 	rows, err := r.pool.Query(ctx, `
 		SELECT
 			p.title,
@@ -160,8 +152,8 @@ func (r *PgxRepository) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRe
 		JOIN products p ON p.id = oi.product_id
 		JOIN orders o ON o.id = oi.order_id
 		GROUP BY p.id, p.title
-		ORDER BY revenue DESC
-	`)
+		ORDER BY revenue DESC LIMIT $1 OFFSET $2
+	`, limit, offset)
 
 	if err != nil {
 		return nil, err

@@ -46,6 +46,6 @@ func (s *Service) Create(ctx context.Context, title string, price float64, categ
 	return s.repo.Create(ctx, title, price, categoryID)
 }
 
-func (s *Service) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRevenue, error) {
-	return s.repo.TotalRevenue(ctx)
+func (s *Service) TotalRevenue(ctx context.Context, limit int, offset int) ([]*proddomain.TotalRevenue, error) {
+	return s.repo.TotalRevenue(ctx, limit, offset)
 }

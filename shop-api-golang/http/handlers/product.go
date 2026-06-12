@@ -171,11 +171,25 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	dto.ListTotalRevenueResponse
 //	@Router			/products/revenue [get]
+//
+//	@Param			limit	query	int	false	"Number of products to return (default 10)"
+//	@Param			offset	query	int	false	"Number of products to skip (default 0)"
 func (h *ProductHandler) TotalRevenue(c *gin.Context) {
+	defaultLimit := 10
+	defaultOffset := 0
+
+	if limit, err := strconv.Atoi(c.Query("limit")); err == nil && limit > 0 {
+		defaultLimit = limit
+	}
+
+	if offset, err := strconv.Atoi(c.Query("offset")); err == nil && offset >= 0 {
+		defaultOffset = offset
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	totalRevenues, err := h.service.TotalRevenue(ctx)
+	totalRevenues, err := h.service.TotalRevenue(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})

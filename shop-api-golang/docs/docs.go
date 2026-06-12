@@ -423,6 +423,20 @@ const docTemplate = `{
                     "products"
                 ],
                 "summary": "Get total revenue per product",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Number of products to return (default 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of products to skip (default 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
