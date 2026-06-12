@@ -57,9 +57,10 @@ func (h *ProductHandler) ListProducts(c *gin.Context) {
 
 	for _, p := range products {
 		res = append(res, dto.ProductResponse{
-			ID:    p.ID(),
-			Title: p.Title(),
-			Price: p.Price(),
+			ID:       p.ID(),
+			Title:    p.Title(),
+			Price:    p.Price(),
+			Category: p.Category(),
 		})
 	}
 
@@ -107,13 +108,15 @@ func (h *ProductHandler) ListCursorProducts(c *gin.Context) {
 
 	for _, p := range products {
 		res = append(res, dto.ProductResponse{
-			ID:    p.ID(),
-			Title: p.Title(),
-			Price: p.Price(),
+			ID:       p.ID(),
+			Title:    p.Title(),
+			Price:    p.Price(),
+			Category: p.Category(),
 		})
 	}
 
 	var nextCursor int64
+
 	if len(res) > 0 {
 		nextCursor = res[len(res)-1].ID
 	}
@@ -146,16 +149,17 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	product, err := h.service.Create(ctx, req.Title, req.Price)
+	product, err := h.service.Create(ctx, req.Title, req.Price, req.CategoryID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, dto.ProductResponse{
-		ID:    product.ID(),
-		Title: product.Title(),
-		Price: product.Price(),
+		ID:       product.ID(),
+		Title:    product.Title(),
+		Price:    product.Price(),
+		Category: product.Category(),
 	})
 }
 

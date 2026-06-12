@@ -1,9 +1,10 @@
 package dto
 
 type ProductResponse struct {
-	ID    int64   `json:"id" example:"1" binding:"required"`
-	Title string  `json:"title" example:"Keyboard" binding:"required"`
-	Price float64 `json:"price" example:"150.00" binding:"required"`
+	ID       int64   `json:"id" example:"1" binding:"required"`
+	Title    string  `json:"title" example:"Keyboard" binding:"required"`
+	Price    float64 `json:"price" example:"150.00" binding:"required"`
+	Category string  `json:"category" example:"Electoronics" binding:"required"`
 }
 
 type ListProductResponse struct {
@@ -12,8 +13,9 @@ type ListProductResponse struct {
 }
 
 type CreateProductRequest struct {
-	Title string  `json:"title" example:"Keyboard"`
-	Price float64 `json:"price" example:"150.00"`
+	Title      string  `json:"title" example:"Keyboard"`
+	Price      float64 `json:"price" example:"150.00"`
+	CategoryID *int64  `json:"category_id,omitempty"`
 }
 
 type CursorProductsResponse struct {

@@ -34,7 +34,7 @@ func (s *Service) ListCursor(ctx context.Context, cursor int, limit int) ([]*pro
 	return s.repo.ListCursor(ctx, cursor, limit)
 }
 
-func (s *Service) Create(ctx context.Context, title string, price float64) (*proddomain.Product, error) {
+func (s *Service) Create(ctx context.Context, title string, price float64, categoryID *int64) (*proddomain.Product, error) {
 	if title == "" {
 		return nil, errors.New("title is required")
 	}
@@ -43,7 +43,7 @@ func (s *Service) Create(ctx context.Context, title string, price float64) (*pro
 		return nil, errors.New("price must be positive")
 	}
 
-	return s.repo.Create(ctx, title, price)
+	return s.repo.Create(ctx, title, price, categoryID)
 }
 
 func (s *Service) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRevenue, error) {

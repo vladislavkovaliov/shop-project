@@ -707,6 +707,9 @@ const docTemplate = `{
         "dto.CreateProductRequest": {
             "type": "object",
             "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
                 "price": {
                     "type": "number",
                     "example": 150
@@ -1051,11 +1054,16 @@ const docTemplate = `{
         "dto.ProductResponse": {
             "type": "object",
             "required": [
+                "category",
                 "id",
                 "price",
                 "title"
             ],
             "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Electoronics"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
