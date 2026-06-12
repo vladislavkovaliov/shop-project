@@ -364,11 +364,14 @@ definitions:
     type: object
   dto.TotalRevenueResponse:
     properties:
+      growth:
+        $ref: '#/definitions/dto.GrowthResponse'
       revenue:
         type: number
       title:
         type: string
     required:
+    - growth
     - revenue
     - title
     type: object

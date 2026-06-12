@@ -24,11 +24,6 @@ type ListCategoryAvaragePriceResponse struct {
 	Total int                    `json:"total" binding:"required"`
 }
 
-type GrowthResponse struct {
-	Value float64 `json:"value" binding:"required"`
-	Sign  string  `json:"sign" binding:"required"`
-}
-
 type CategoryRevenueResponse struct {
 	Category string         `json:"category" binding:"required"`
 	Products int            `json:"products" binding:"required"`

@@ -24,8 +24,9 @@ type CursorProductsResponse struct {
 }
 
 type TotalRevenueResponse struct {
-	Title   string  `json:"title" binding:"required"`
-	Revenue float64 `json:"revenue" binding:"required"`
+	Title   string         `json:"title" binding:"required"`
+	Revenue float64        `json:"revenue" binding:"required"`
+	Growth  GrowthResponse `json:"growth" binding:"required"`
 }
 
 type ListTotalRevenueResponse struct {

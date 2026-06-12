@@ -1114,10 +1114,14 @@ const docTemplate = `{
         "dto.TotalRevenueResponse": {
             "type": "object",
             "required": [
+                "growth",
                 "revenue",
                 "title"
             ],
             "properties": {
+                "growth": {
+                    "$ref": "#/definitions/dto.GrowthResponse"
+                },
                 "revenue": {
                     "type": "number"
                 },

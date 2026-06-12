@@ -2,12 +2,12 @@ package category
 
 import (
 	"context"
-	"math"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	categorydomain "shop-api/domain/category"
+	"shop-api/domain/growth"
 )
 
 type PgxRepository struct {
@@ -20,7 +20,9 @@ func NewPgxRepository(pool *pgxpool.Pool) *PgxRepository {
 
 func (r *PgxRepository) Count(ctx context.Context) (int, error) {
 	var total int
+
 	err := r.pool.QueryRow(ctx, "SELECT COUNT(*) FROM categories").Scan(&total)
+
 	return total, err
 }
 
@@ -92,29 +94,12 @@ func (r *PgxRepository) ListCategoryRevenue(ctx context.Context, limit int, offs
 			return nil, err
 		}
 
-		growth := calculateGrowth(recentRevenue, previousRevenue)
+		growth := growth.CalculateGrowth(recentRevenue, previousRevenue)
 
 		stats = append(stats, categorydomain.NewCategoryRevenue(category, products, revenue, orders, growth))
 	}
 
 	return stats, rows.Err()
-}
-
-func calculateGrowth(recent, previous float64) categorydomain.Growth {
-	if previous == 0 {
-		return categorydomain.NewGrowth(0, "+")
-	}
-
-	growth := ((recent - previous) / previous) * 100
-
-	sign := "+"
-
-	if growth < 0 {
-		sign = "-"
-		growth = -growth
-	}
-
-	return categorydomain.NewGrowth(math.Round(growth*10)/10, sign)
 }
 
 func (r *PgxRepository) ListCategoryAvaragePrice(ctx context.Context) ([]*categorydomain.CategoryAvaragePrice, error) {

@@ -188,6 +188,10 @@ func (h *ProductHandler) TotalRevenue(c *gin.Context) {
 		res = append(res, dto.TotalRevenueResponse{
 			Title:   p.Title(),
 			Revenue: p.Revenue(),
+			Growth: dto.GrowthResponse{
+				Value: p.Growth().Value(),
+				Sign:  p.Growth().Sign(),
+			},
 		})
 	}
 

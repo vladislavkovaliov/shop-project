@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"shop-api/domain/growth"
 	proddomain "shop-api/domain/product"
 )
 
@@ -141,12 +142,25 @@ func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*pro
 }
 
 func (r *PgxRepository) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRevenue, error) {
+	// rows, err := r.pool.Query(ctx, `
+	// 	SELECT p.title, SUM(p.price * oi.quantity) AS revenue
+	// 	FROM order_items oi
+	// 	JOIN products p ON p.id = oi.product_id
+	// 	GROUP BY p.id, p.title
+	// 	ORDER BY revenue DESC;
+	// `)
+
 	rows, err := r.pool.Query(ctx, `
-		SELECT p.title, SUM(p.price * oi.quantity) AS revenue
+		SELECT
+			p.title,
+			COALESCE(SUM(oi.quantity * p.price), 0) AS revenue,
+			COALESCE(SUM(oi.quantity * p.price) FILTER (WHERE o.created_at >= NOW() - interval '15 days'), 0) AS recent,
+			COALESCE(SUM(oi.quantity * p.price) FILTER (WHERE o.created_at < NOW() - interval '15 days'), 0) AS previous
 		FROM order_items oi
 		JOIN products p ON p.id = oi.product_id
+		JOIN orders o ON o.id = oi.order_id
 		GROUP BY p.id, p.title
-		ORDER BY revenue DESC;
+		ORDER BY revenue DESC
 	`)
 
 	if err != nil {
@@ -159,13 +173,15 @@ func (r *PgxRepository) TotalRevenue(ctx context.Context) ([]*proddomain.TotalRe
 
 	for rows.Next() {
 		var title string
-		var revenue float64
+		var revenue, recentRevenue, previousRevenue float64
 
-		if err := rows.Scan(&title, &revenue); err != nil {
+		if err := rows.Scan(&title, &revenue, &recentRevenue, &previousRevenue); err != nil {
 			return nil, err
 		}
 
-		totalRevenues = append(totalRevenues, proddomain.NewTotalRevenue(title, revenue))
+		growth := growth.CalculateGrowth(recentRevenue, previousRevenue)
+
+		totalRevenues = append(totalRevenues, proddomain.NewTotalRevenue(title, revenue, growth))
 	}
 
 	return totalRevenues, rows.Err()
