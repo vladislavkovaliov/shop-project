@@ -141,7 +141,7 @@ func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*pro
 	return products, rows.Err()
 }
 
-func (r *PgxRepository) TotalRevenue(ctx context.Context, limit int, offset int) ([]*proddomain.TotalRevenue, error) {
+func (r *PgxRepository) ListRevenueReport(ctx context.Context, limit int, offset int) ([]*proddomain.RevenueReport, error) {
 	rows, err := r.pool.Query(ctx, `
 		SELECT
 			p.title,
@@ -161,7 +161,7 @@ func (r *PgxRepository) TotalRevenue(ctx context.Context, limit int, offset int)
 
 	defer rows.Close()
 
-	var totalRevenues []*proddomain.TotalRevenue
+	var totalRevenues []*proddomain.RevenueReport
 
 	for rows.Next() {
 		var title string
@@ -173,7 +173,7 @@ func (r *PgxRepository) TotalRevenue(ctx context.Context, limit int, offset int)
 
 		growth := growth.CalculateGrowth(recentRevenue, previousRevenue)
 
-		totalRevenues = append(totalRevenues, proddomain.NewTotalRevenue(title, revenue, growth))
+		totalRevenues = append(totalRevenues, proddomain.NewRevenueReport(title, revenue, growth))
 	}
 
 	return totalRevenues, rows.Err()

@@ -163,18 +163,18 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	})
 }
 
-// TotalRevenue godoc
+// ListRevenueReport godoc
 //
 //	@Summary		Get total revenue per product
 //	@Description	Returns products sorted by total revenue (SUM of price * quantity per product)
 //	@Tags			products
 //	@Produce		json
-//	@Success		200	{object}	dto.ListTotalRevenueResponse
-//	@Router			/products/revenue [get]
+//	@Success		200	{object}	dto.ListRevenueReportResponse
+//	@Router			/products/revenue-report [get]
 //
 //	@Param			limit	query	int	false	"Number of products to return (default 10)"
 //	@Param			offset	query	int	false	"Number of products to skip (default 0)"
-func (h *ProductHandler) TotalRevenue(c *gin.Context) {
+func (h *ProductHandler) ListRevenueReport(c *gin.Context) {
 	defaultLimit := 10
 	defaultOffset := 0
 
@@ -189,17 +189,17 @@ func (h *ProductHandler) TotalRevenue(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	totalRevenues, err := h.service.TotalRevenue(ctx, defaultLimit, defaultOffset)
+	totalRevenues, err := h.service.ListRevenueReport(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	res := make([]dto.TotalRevenueResponse, 0, len(totalRevenues))
+	res := make([]dto.RevenueReportResponse, 0, len(totalRevenues))
 
 	for _, p := range totalRevenues {
-		res = append(res, dto.TotalRevenueResponse{
+		res = append(res, dto.RevenueReportResponse{
 			Title:   p.Title(),
 			Revenue: p.Revenue(),
 			Growth: dto.GrowthResponse{
@@ -209,7 +209,7 @@ func (h *ProductHandler) TotalRevenue(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, dto.ListTotalRevenueResponse{
+	c.JSON(http.StatusOK, dto.ListRevenueReportResponse{
 		Data:  res,
 		Total: len(totalRevenues),
 	})

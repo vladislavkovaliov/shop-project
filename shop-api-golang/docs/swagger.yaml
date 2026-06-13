@@ -239,11 +239,11 @@ definitions:
     - data
     - total
     type: object
-  dto.ListTotalRevenueResponse:
+  dto.ListRevenueReportResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/dto.TotalRevenueResponse'
+          $ref: '#/definitions/dto.RevenueReportResponse'
         type: array
       total:
         type: integer
@@ -339,6 +339,19 @@ definitions:
     - price
     - title
     type: object
+  dto.RevenueReportResponse:
+    properties:
+      growth:
+        $ref: '#/definitions/dto.GrowthResponse'
+      revenue:
+        type: number
+      title:
+        type: string
+    required:
+    - growth
+    - revenue
+    - title
+    type: object
   dto.StatsOrderResponse:
     properties:
       averageCheck:
@@ -361,19 +374,6 @@ definitions:
         type: number
       title:
         type: string
-    type: object
-  dto.TotalRevenueResponse:
-    properties:
-      growth:
-        $ref: '#/definitions/dto.GrowthResponse'
-      revenue:
-        type: number
-      title:
-        type: string
-    required:
-    - growth
-    - revenue
-    - title
     type: object
   dto.UserByMostExpensiveProduct:
     properties:
@@ -703,7 +703,7 @@ paths:
       summary: List products (cursor-based)
       tags:
       - products
-  /products/revenue:
+  /products/revenue-report:
     get:
       description: Returns products sorted by total revenue (SUM of price * quantity
         per product)
@@ -722,7 +722,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ListTotalRevenueResponse'
+            $ref: '#/definitions/dto.ListRevenueReportResponse'
       summary: Get total revenue per product
       tags:
       - products

@@ -23,13 +23,13 @@ type CursorProductsResponse struct {
 	NextCursor int64             `json:"next_cursor" binding:"required"`
 }
 
-type TotalRevenueResponse struct {
+type RevenueReportResponse struct {
 	Title   string         `json:"title" binding:"required"`
 	Revenue float64        `json:"revenue" binding:"required"`
 	Growth  GrowthResponse `json:"growth" binding:"required"`
 }
 
-type ListTotalRevenueResponse struct {
-	Data  []TotalRevenueResponse `json:"data" binding:"required"`
-	Total int                    `json:"total" binding:"required"`
+type ListRevenueReportResponse struct {
+	Data  []RevenueReportResponse `json:"data" binding:"required"`
+	Total int                     `json:"total" binding:"required"`
 }

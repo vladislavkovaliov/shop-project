@@ -53,6 +53,7 @@ export interface DtoCreateOrderResponse {
 }
 
 export interface DtoCreateProductRequest {
+  category_id?: number;
   /** @example 150 */
   price?: number;
   /** @example "Keyboard" */
@@ -123,8 +124,8 @@ export interface DtoListProductResponse {
   total: number;
 }
 
-export interface DtoListTotalRevenueResponse {
-  data: DtoTotalRevenueResponse[];
+export interface DtoListRevenueReportResponse {
+  data: DtoRevenueReportResponse[];
   total: number;
 }
 
@@ -160,11 +161,19 @@ export interface DtoOrderResponse {
 }
 
 export interface DtoProductResponse {
+  /** @example "Electoronics" */
+  category: string;
   /** @example 1 */
   id: number;
   /** @example 150 */
   price: number;
   /** @example "Keyboard" */
+  title: string;
+}
+
+export interface DtoRevenueReportResponse {
+  growth: DtoGrowthResponse;
+  revenue: number;
   title: string;
 }
 
@@ -178,19 +187,8 @@ export interface DtoStatsOrderResponse {
 }
 
 export interface DtoTopCategoryResponse {
-  title: string;
-  revenue: number;
-}
-
-export interface DtoWidgetStatsResponse {
-  totalCategories: number;
-  totalProducts: number;
-  topCategory: DtoTopCategoryResponse;
-}
-
-export interface DtoTotalRevenueResponse {
-  revenue: number;
-  title: string;
+  revenue?: number;
+  title?: string;
 }
 
 export interface DtoUserByMostExpensiveProduct {
@@ -222,6 +220,12 @@ export interface DtoUserWithPurchases {
   purchases: number;
 }
 
+export interface DtoWidgetStatsResponse {
+  topCategory?: DtoTopCategoryResponse;
+  totalCategories?: number;
+  totalProducts?: number;
+}
+
 export interface CategoriesListParams {
   /** Number of categories to return (default 10) */
   limit?: number;
@@ -242,7 +246,7 @@ export interface RevenueListParams {
 
 export type RevenueListData = DtoListCategoryRevenueResponse;
 
-export type StatsListData = DtoStatsOrderResponse;
+export type StatsListData = DtoWidgetStatsResponse;
 
 export interface OrdersListParams {
   /** Number of products to return (default 10) */
@@ -295,7 +299,14 @@ export interface CursorListParams {
 
 export type CursorListData = DtoCursorProductsResponse;
 
-export type RevenueListResult = DtoListTotalRevenueResponse;
+export interface RevenueReportListParams {
+  /** Number of products to return (default 10) */
+  limit?: number;
+  /** Number of products to skip (default 0) */
+  offset?: number;
+}
+
+export type RevenueReportListData = DtoListRevenueReportResponse;
 
 export interface UsersListParams {
   /** Number of users to return (default 10) */

@@ -11,6 +11,8 @@ import { OrderService } from '@app/services/orders/order.service';
 import { MockOrderService } from '@app/services/orders/order.service.mock';
 import { CategoryService } from '@app/services/categories/category.service';
 import { MockCategoryService } from '@app/services/categories/category.service.mock';
+import { ProductService } from '@app/services/products/product.service';
+import { MockProductService } from '@app/services/products/product.service.mock';
 import { IS_MOCK } from '@app/tokens/is-mock.token';
 
 const USE_MOCK = false;
@@ -29,5 +31,8 @@ export const appConfig: ApplicationConfig = {
     USE_MOCK
       ? { provide: CategoryService, useClass: MockCategoryService }
       : CategoryService,
+    USE_MOCK
+      ? { provide: ProductService, useClass: MockProductService }
+      : ProductService,
   ],
 };

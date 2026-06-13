@@ -413,7 +413,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/revenue": {
+        "/products/revenue-report": {
             "get": {
                 "description": "Returns products sorted by total revenue (SUM of price * quantity per product)",
                 "produces": [
@@ -441,7 +441,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListTotalRevenueResponse"
+                            "$ref": "#/definitions/dto.ListRevenueReportResponse"
                         }
                     }
                 }
@@ -948,7 +948,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ListTotalRevenueResponse": {
+        "dto.ListRevenueReportResponse": {
             "type": "object",
             "required": [
                 "data",
@@ -958,7 +958,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.TotalRevenueResponse"
+                        "$ref": "#/definitions/dto.RevenueReportResponse"
                     }
                 },
                 "total": {
@@ -1092,6 +1092,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RevenueReportResponse": {
+            "type": "object",
+            "required": [
+                "growth",
+                "revenue",
+                "title"
+            ],
+            "properties": {
+                "growth": {
+                    "$ref": "#/definitions/dto.GrowthResponse"
+                },
+                "revenue": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.StatsOrderResponse": {
             "type": "object",
             "required": [
@@ -1117,25 +1136,6 @@ const docTemplate = `{
         "dto.TopCategoryResponse": {
             "type": "object",
             "properties": {
-                "revenue": {
-                    "type": "number"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.TotalRevenueResponse": {
-            "type": "object",
-            "required": [
-                "growth",
-                "revenue",
-                "title"
-            ],
-            "properties": {
-                "growth": {
-                    "$ref": "#/definitions/dto.GrowthResponse"
-                },
                 "revenue": {
                     "type": "number"
                 },

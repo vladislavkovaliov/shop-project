@@ -46,11 +46,11 @@ export class CategoryService {
   getCategoryStats(): Observable<CategoryStats> {
     return this.http.get<DtoWidgetStatsResponse>(CategoryService.getCategoryStatsUrl).pipe(
       map(response => ({
-        totalCategories: response.totalCategories,
-        totalProducts: response.totalProducts,
+        totalCategories: response.totalCategories ?? 0,
+        totalProducts: response.totalProducts ?? 0,
         topCategory: {
-          title: response.topCategory.title,
-          revenue: response.topCategory.revenue,
+          title: response.topCategory?.title ?? '',
+          revenue: response.topCategory?.revenue ?? 0,
         },
       })),
     );
