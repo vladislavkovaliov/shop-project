@@ -8,6 +8,7 @@ import (
 
 	"shop-api/http/handlers"
 	"shop-api/internal/events"
+	"shop-api/internal/rabbit"
 	categoryrepo "shop-api/repository/category"
 	orderrepo "shop-api/repository/order"
 	productrepo "shop-api/repository/product"
@@ -20,13 +21,13 @@ import (
 	widgetservice "shop-api/service/widget"
 )
 
-func setupRouter(pool *pgxpool.Pool, producer *events.Producer) *gin.Engine {
+func setupRouter(pool *pgxpool.Pool, producer *events.Producer, rabbitProducer *rabbit.Producer) *gin.Engine {
 	r := gin.Default()
 
 	api := r.Group("/api")
 	{
 		wireProducts(api, pool)
-		wireOrders(api, pool, producer)
+		wireOrders(api, pool, producer, rabbitProducer)
 		wireCategories(api, pool)
 		wireUsers(api, pool, producer)
 	}
@@ -47,9 +48,9 @@ func wireProducts(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 	rg.GET("/products/revenue-stats", h.GetRevenueStats)
 }
 
-func wireOrders(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer) {
+func wireOrders(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer, rabbitProduct *rabbit.Producer) {
 	repo := orderrepo.NewPgxRepository(pool)
-	svc := orderservice.New(repo, producer)
+	svc := orderservice.New(repo, producer, rabbitProduct)
 	h := handlers.NewOrderHandler(svc)
 
 	rg.GET("/orders/stats", h.StatsOrder)

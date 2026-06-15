@@ -2,17 +2,20 @@ package order
 
 import (
 	"context"
+	"log/slog"
 	orderdomain "shop-api/domain/order"
 	"shop-api/internal/events"
+	"shop-api/internal/rabbit"
 )
 
 type Service struct {
-	repo     orderdomain.Repository
-	producer *events.Producer
+	repo           orderdomain.Repository
+	producer       *events.Producer
+	rabbitProducer *rabbit.Producer
 }
 
-func New(repo orderdomain.Repository, producer *events.Producer) *Service {
-	return &Service{repo: repo, producer: producer}
+func New(repo orderdomain.Repository, producer *events.Producer, rabbitProducer *rabbit.Producer) *Service {
+	return &Service{repo: repo, producer: producer, rabbitProducer: rabbitProducer}
 }
 
 func (s *Service) Count(ctx context.Context) (int, error) {
@@ -84,6 +87,10 @@ func (s *Service) Create(ctx context.Context, userID int64, items []orderdomain.
 		CreatedAt: order.CreatedAt(),
 	}); err != nil {
 		return nil, nil, err
+	}
+
+	if err := s.rabbitProducer.PublishOrderCreated(ctx, order.ID(), order.UserID()); err != nil {
+		slog.Error("rabbit publish order created", "error", err)
 	}
 
 	return order, orderItems, nil

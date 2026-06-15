@@ -3,6 +3,8 @@
 -- =====================================================
 
 -- 1. Таблицы (порядок важен из-за FK)
+DROP TABLE IF EXISTS daily_user_registrations CASCADE;
+DROP TABLE IF EXISTS daily_purchases CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS product_categories CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
@@ -46,6 +48,16 @@ CREATE TABLE order_items (
     product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     quantity   INT NOT NULL DEFAULT 1,
     PRIMARY KEY (order_id, product_id)
+);
+
+CREATE TABLE daily_purchases (
+    order_date DATE PRIMARY KEY,
+    purchases INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE daily_user_registrations (
+    created_at DATE PRIMARY KEY,
+    count INT NOT NULL DEFAULT 0
 );
 
 -- 2. Пользователи

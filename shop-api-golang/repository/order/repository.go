@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"time"
 
@@ -113,14 +114,17 @@ func (r *PgxRepository) Create(ctx context.Context, userID int64, items []orderd
 
 	var orderID int64
 	var createdAt time.Time
+	fmt.Println(1)
 
 	err = tx.QueryRow(ctx, `
 		INSERT INTO orders (user_id) VALUES ($1) RETURNING id, created_at
 	`, userID).Scan(&orderID, &createdAt)
-
+	fmt.Println(2)
+	fmt.Println(err)
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Println(3)
 
 	for _, item := range items {
 		_, err = tx.Exec(ctx, `

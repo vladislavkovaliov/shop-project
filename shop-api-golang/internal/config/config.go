@@ -10,6 +10,7 @@ type Config struct {
 	Port          string
 	DatabaseUrl   string
 	KafkaBrockers string
+	RABBITMQ_URL  string
 }
 
 func LoadConfig() *Config {
@@ -19,6 +20,7 @@ func LoadConfig() *Config {
 		Port:          getEnv("PORT", "8080"),
 		DatabaseUrl:   getEnv("DATABASE_URL", "postgres://postgres:password@localhost:55000/shop?sslmode=disable"),
 		KafkaBrockers: getEnv("KAFKA_BROKERS", "localhost:9092"),
+		RABBITMQ_URL:  getEnv("RabbiRABBITMQ_URLtMQ", "amqp://guest:guest@localhost:5672"),
 	}
 }
 

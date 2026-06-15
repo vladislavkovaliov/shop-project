@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - pgdata:/var/lib/postgresql/18/docker
+      - ./pgdata_backup:/var/lib/postgresql/18/docker
   console:
     image: docker.redpanda.com/redpandadata/console:latest
     ports:
@@ -28,6 +28,12 @@ services:
       KAFKA_BROKERS: redpanda:9092
     depends_on:
       - redpanda
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
 
 volumes:
   pgdata:

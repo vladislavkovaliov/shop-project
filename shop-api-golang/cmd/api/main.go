@@ -18,6 +18,7 @@ import (
 	_ "shop-api/docs"
 	"shop-api/internal/config"
 	"shop-api/internal/events"
+	"shop-api/internal/rabbit"
 
 	orderrepo "shop-api/repository/order"
 	userrepo "shop-api/repository/user"
@@ -38,6 +39,22 @@ func main() {
 
 	producer := events.NewProducer(brokers)
 
+	rabbitProducer, err := rabbit.NewProducer(cfg.RABBITMQ_URL)
+
+	if err != nil {
+		log.Fatalf("failed to create rabbit producer: %v", err)
+	}
+
+	defer rabbitProducer.Close()
+
+	rabbitConsumer, err := rabbit.NewConsumer(cfg.RABBITMQ_URL)
+
+	if err != nil {
+		log.Fatalf("failed to create rabbit consumer: %v", err)
+	}
+
+	defer rabbitConsumer.Close()
+
 	defer producer.Close()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -48,8 +65,9 @@ func main() {
 
 	go events.StartOrderConsumer(ctx, brokers, "shop-api-orders", orderRepo)
 	go events.StartUserConsumer(ctx, brokers, "shop-api-users", userRepo)
+	go rabbitConsumer.Start(ctx)
 
-	r := setupRouter(pool, producer)
+	r := setupRouter(pool, producer, rabbitProducer)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Port,
