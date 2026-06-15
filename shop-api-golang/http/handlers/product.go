@@ -214,3 +214,29 @@ func (h *ProductHandler) ListRevenueReport(c *gin.Context) {
 		Total: len(totalRevenues),
 	})
 }
+
+// GetRevenueStats godoc
+//
+//	@Summary		Get revenue stats
+//	@Description	Returns revenue stasts
+//	@Tags			products
+//	@Produce		json
+//	@Success		200	{object}	dto.RevenueStatsResponse
+//	@Router			/products/revenue-stats [get]
+func (h *ProductHandler) GetRevenueStats(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	revenueStats, err := h.service.GetRevenueStats(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.RevenueStatsResponse{
+		TotalRevenue:      revenueStats.TotalRevenue(),
+		AverageOrderValue: revenueStats.AverageOrderValue(),
+		TotalProductsSold: revenueStats.TotalProductsSold(),
+	})
+}

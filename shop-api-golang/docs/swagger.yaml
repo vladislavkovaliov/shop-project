@@ -95,6 +95,16 @@ definitions:
         example: Keyboard
         type: string
     type: object
+  dto.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    required:
+    - email
+    - name
+    type: object
   dto.CursorProductsResponse:
     properties:
       next_cursor:
@@ -144,6 +154,16 @@ definitions:
     - date
     - orders
     - revenue
+    type: object
+  dto.DailyUserRegistrationResponse:
+    properties:
+      count:
+        type: integer
+      createdAt:
+        type: string
+    required:
+    - count
+    - createdAt
     type: object
   dto.GrowthResponse:
     properties:
@@ -275,11 +295,11 @@ definitions:
     - data
     - total
     type: object
-  dto.ListUserWithPurchasesResponse:
+  dto.ListUserWithTotalResponse:
     properties:
       data:
         items:
-          $ref: '#/definitions/dto.UserWithPurchases'
+          $ref: '#/definitions/dto.UserWithTotalSpent'
         type: array
       total:
         type: integer
@@ -352,6 +372,22 @@ definitions:
     - revenue
     - title
     type: object
+  dto.RevenueStatsResponse:
+    properties:
+      averageOrderValue:
+        example: 123.123
+        type: number
+      totalProductsSold:
+        example: 123
+        type: integer
+      totalRevenue:
+        example: 123.123
+        type: number
+    required:
+    - averageOrderValue
+    - totalProductsSold
+    - totalRevenue
+    type: object
   dto.StatsOrderResponse:
     properties:
       averageCheck:
@@ -407,7 +443,7 @@ definitions:
     - id
     - name
     type: object
-  dto.UserWithPurchases:
+  dto.UserWithTotalSpent:
     properties:
       email:
         example: text@gmail.com
@@ -418,14 +454,14 @@ definitions:
       name:
         example: username
         type: string
-      purchases:
-        example: 1
-        type: integer
+      totalSpent:
+        example: 123.123
+        type: number
     required:
     - email
     - id
     - name
-    - purchases
+    - totalSpent
     type: object
   dto.WidgetStatsResponse:
     properties:
@@ -726,6 +762,19 @@ paths:
       summary: Get total revenue per product
       tags:
       - products
+  /products/revenue-stats:
+    get:
+      description: Returns revenue stasts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RevenueStatsResponse'
+      summary: Get revenue stats
+      tags:
+      - products
   /users:
     get:
       description: Returns all users from the database
@@ -746,6 +795,39 @@ paths:
           schema:
             $ref: '#/definitions/dto.ListUserResponse'
       summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user and publishes UserCreated event to Kafka
+      parameters:
+      - description: User data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a user
       tags:
       - users
   /users/by-most-expensive-product:
@@ -784,6 +866,25 @@ paths:
       summary: List users (cursor-based)
       tags:
       - users
+  /users/daily-registrations:
+    get:
+      description: Returns user registration count for today
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DailyUserRegistrationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get daily user registration
+      tags:
+      - users
   /users/search:
     get:
       description: Search users by field (partial match)
@@ -813,15 +914,15 @@ paths:
       - users
   /users/top-3-users:
     get:
-      description: Returns top 3 users with the highest number of purchases
+      description: Returns top 3 users with the highest number of total spent
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ListUserWithPurchasesResponse'
-      summary: Get top 3 users by purchases
+            $ref: '#/definitions/dto.ListUserWithTotalResponse'
+      summary: Get top 3 users by total spent
       tags:
       - users
 swagger: "2.0"

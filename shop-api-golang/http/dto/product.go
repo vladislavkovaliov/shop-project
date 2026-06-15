@@ -33,3 +33,9 @@ type ListRevenueReportResponse struct {
 	Data  []RevenueReportResponse `json:"data" binding:"required"`
 	Total int                     `json:"total" binding:"required"`
 }
+
+type RevenueStatsResponse struct {
+	TotalRevenue      float64 `json:"totalRevenue" example:"123.123" binding:"required"`
+	AverageOrderValue float64 `json:"averageOrderValue" example:"123.123" binding:"required"`
+	TotalProductsSold int64   `json:"totalProductsSold" example:"123" binding:"required"`
+}

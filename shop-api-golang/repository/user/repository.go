@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -125,13 +126,20 @@ func (r *PgxRepository) Search(ctx context.Context, field string, value string) 
 	return users, rows.Err()
 }
 
-func (r *PgxRepository) ListTop3Users(ctx context.Context) ([]*userdomain.UserWithPurchases, error) {
+func (r *PgxRepository) ListTop3Users(ctx context.Context) ([]*userdomain.UserWithTotalSpent, error) {
 	rows, err := r.pool.Query(ctx, `
-		SELECT u.id, u.name, u.email, COUNT(*) as "purchases" FROM users u
-		JOIN orders o ON o.user_id = u.id
-		GROUP BY u.id, u.email, u.name
-		ORDER BY purchases DESC
-		LIMIT 3; 
+		SELECT 
+			o.user_id,
+			u.name,
+			u.email,
+			SUM(oi.quantity * p.price) AS total_spent
+		FROM orders o
+		JOIN order_items oi on o.id = oi.order_id
+		JOIN products p ON oi.product_id = p.id
+		JOIN users u ON u.id = o.user_id
+		GROUP BY o.user_id, u.name, u.email
+		ORDER BY total_spent DESC
+		LIMIT 3
 	`)
 
 	if err != nil {
@@ -140,19 +148,19 @@ func (r *PgxRepository) ListTop3Users(ctx context.Context) ([]*userdomain.UserWi
 
 	defer rows.Close()
 
-	var top3Users []*userdomain.UserWithPurchases
+	var top3Users []*userdomain.UserWithTotalSpent
 
 	for rows.Next() {
 		var id int64
 		var name string
 		var email string
-		var purchases int
+		var totalSpent float64
 
-		if err := rows.Scan(&id, &name, &email, &purchases); err != nil {
+		if err := rows.Scan(&id, &name, &email, &totalSpent); err != nil {
 			return nil, err
 		}
 
-		top3Users = append(top3Users, userdomain.NewUserWithPurchases(id, name, email, purchases))
+		top3Users = append(top3Users, userdomain.NewUserWithTotalSpent(id, name, email, totalSpent))
 	}
 
 	return top3Users, rows.Err()
@@ -166,7 +174,7 @@ func (r *PgxRepository) ListUserByMostExpensiveProduct(ctx context.Context) ([]*
 		WHERE oi.product_id = (
 			SELECT id FROM products
 			ORDER BY price DESC
-			LIMIT 10
+			LIMIT 1
 		);
 	`)
 
@@ -195,4 +203,53 @@ func (r *PgxRepository) ListUserByMostExpensiveProduct(ctx context.Context) ([]*
 
 	return userByMostExpensiveProducts, rows.Err()
 
+}
+
+func (r *PgxRepository) Create(ctx context.Context, name string, email string) (*userdomain.User, error) {
+	var userID int64
+
+	err := r.pool.QueryRow(ctx, "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id", name, email).Scan(&userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return userdomain.NewUser(userID, name, email), err
+}
+
+func (r *PgxRepository) UpsertDailyUserRegistration(ctx context.Context, date time.Time) error {
+	_, err := r.pool.Exec(ctx, `
+		INSERT INTO daily_user_registrations (created_at, count) VALUES ($1, 1)
+		ON CONFLICT (created_at) DO UPDATE SET count = daily_user_registrations.count + 1
+	`, date)
+
+	return err
+}
+
+func (r *PgxRepository) ListDailyUserRegistration(ctx context.Context) ([]*userdomain.DailyUserRegistration, error) {
+	rows, err := r.pool.Query(ctx, "SELECT created_at, count FROM daily_user_registrations ORDER BY created_at DESC LIMIT 1")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var result []*userdomain.DailyUserRegistration
+
+	for rows.Next() {
+		var createdAt time.Time
+		var count int
+
+		if err := rows.Scan(&createdAt, &count); err != nil {
+			return nil, err
+		}
+
+		result = append(
+			result,
+			userdomain.NewDailyUserRegistration(count, createdAt),
+		)
+	}
+
+	return result, rows.Err()
 }

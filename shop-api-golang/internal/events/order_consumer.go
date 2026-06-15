@@ -11,14 +11,14 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-type Consumer struct {
+type OrderConsumer struct {
 	reader *kafka.Reader
 	// pool   *pgxpool.Pool
 	repo orderdomain.Repository
 }
 
-func NewConsumer(brokers []string, groupID string, repo orderdomain.Repository) *Consumer {
-	return &Consumer{
+func NewOrderConsumer(brokers []string, groupID string, repo orderdomain.Repository) *OrderConsumer {
+	return &OrderConsumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
 			Brokers:  brokers,
 			Topic:    "order.events",
@@ -31,22 +31,8 @@ func NewConsumer(brokers []string, groupID string, repo orderdomain.Repository) 
 	}
 }
 
-func (c *Consumer) Start(ctx context.Context) {
+func (c *OrderConsumer) Start(ctx context.Context) {
 	slog.Info("consumer started", "topic", "order.events")
-
-	// orderDate := event.CreatedAt.Truncate(24 * time.Hour)
-
-	// if _, err := c.pool.Exec(ctx,
-	// 	`INSERT INTO daily_purchases (order_date, purchases) VALUES ($1, 1)
-	//  ON CONFLICT (order_date) DO UPDATE SET purchases = daily_purchases.purchases + 1`,
-	// 	orderDate,
-	// ); err != nil {
-	// 	slog.Error("upsert daily purchase error", "error", err)
-	// }
-
-	// if err := c.repo.UpsertDailyPurchase(ctx, orderDate); err != nil {
-	// 	slog.Error("upsert daily purchase error", "error", err)
-	// }
 
 	for {
 		msg, err := c.reader.ReadMessage(ctx)
@@ -84,12 +70,12 @@ func (c *Consumer) Start(ctx context.Context) {
 	}
 }
 
-func (c *Consumer) Close() error {
+func (c *OrderConsumer) Close() error {
 	return c.reader.Close()
 }
 
-func StartConsumer(ctx context.Context, brokers []string, groupID string, repo orderdomain.Repository) {
-	c := NewConsumer(brokers, groupID, repo)
+func StartOrderConsumer(ctx context.Context, brokers []string, groupID string, repo orderdomain.Repository) {
+	c := NewOrderConsumer(brokers, groupID, repo)
 
 	defer func() {
 		if err := c.Close(); err != nil {

@@ -20,6 +20,7 @@ import (
 	"shop-api/internal/events"
 
 	orderrepo "shop-api/repository/order"
+	userrepo "shop-api/repository/user"
 )
 
 func main() {
@@ -43,8 +44,10 @@ func main() {
 	defer stop()
 
 	orderRepo := orderrepo.NewPgxRepository(pool)
+	userRepo := userrepo.NewPgxRepository(pool)
 
-	go events.StartConsumer(ctx, brokers, "shop-api", orderRepo)
+	go events.StartOrderConsumer(ctx, brokers, "shop-api-orders", orderRepo)
+	go events.StartUserConsumer(ctx, brokers, "shop-api-users", userRepo)
 
 	r := setupRouter(pool, producer)
 

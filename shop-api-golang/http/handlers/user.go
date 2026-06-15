@@ -177,11 +177,11 @@ func (h *UserHandler) Search(c *gin.Context) {
 
 // ListTop3Users godoc
 //
-//	@Summary		Get top 3 users by purchases
-//	@Description	Returns top 3 users with the highest number of purchases
+//	@Summary		Get top 3 users by total spent
+//	@Description	Returns top 3 users with the highest number of total spent
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	dto.ListUserWithPurchasesResponse
+//	@Success		200	{object}	dto.ListUserWithTotalResponse
 //	@Router			/users/top-3-users [get]
 func (h *UserHandler) ListTop3Users(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
@@ -195,18 +195,18 @@ func (h *UserHandler) ListTop3Users(c *gin.Context) {
 		return
 	}
 
-	res := make([]dto.UserWithPurchases, 0, len(top3Users))
+	res := make([]dto.UserWithTotalSpent, 0, len(top3Users))
 
 	for _, u := range top3Users {
-		res = append(res, dto.UserWithPurchases{
-			ID:        u.ID(),
-			Name:      u.Name(),
-			Email:     u.Email(),
-			Purchases: u.Purchases(),
+		res = append(res, dto.UserWithTotalSpent{
+			ID:         u.ID(),
+			Name:       u.Name(),
+			Email:      u.Email(),
+			TotalSpent: u.TotalSpent(),
 		})
 	}
 
-	c.JSON(http.StatusOK, dto.ListUserWithPurchasesResponse{
+	c.JSON(http.StatusOK, dto.ListUserWithTotalResponse{
 		Data:  res,
 		Total: len(res),
 	})
@@ -245,5 +245,80 @@ func (h *UserHandler) ListUserByMostExpensiveProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.ListUserByMostExpensiveProductResponse{
 		Data:  res,
 		Total: len(res),
+	})
+}
+
+// CreateUser godoc
+//
+//	@Summary		Create a user
+//	@Description	Creates a new user and publishes UserCreated event to Kafka
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	dto.CreateUserRequest	true	"User data"
+//	@Success		201		{object}	dto.UserResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Router			/users [post]
+func (h *UserHandler) CreateUser(c *gin.Context) {
+	var req dto.CreateUserRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+
+	defer cancel()
+
+	user, err := h.service.Create(ctx, req.Name, req.Email)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, dto.UserResponse{
+		ID:    user.ID(),
+		Name:  user.Name(),
+		Email: user.Email(),
+	})
+}
+
+// ListDailyUserRegistration godoc
+//
+//	@Summary		Get daily user registration
+//	@Description	Returns user registration count for today
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	dto.DailyUserRegistrationResponse
+//	@Failure		500	{object}	map[string]string
+//	@Router			/users/daily-registrations [get]
+func (h *UserHandler) ListDailyUserRegistration(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+
+	defer cancel()
+
+	registrations, err := h.service.ListDailyUserRegistration(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	res := make([]dto.DailyUserRegistrationResponse, len(registrations))
+
+	for i, r := range registrations {
+		res[i] = dto.DailyUserRegistrationResponse{
+			CreatedAt: r.CreatedAt(),
+			Count:     r.Count(),
+		}
+	}
+
+	c.JSON(http.StatusOK, dto.ListDailyUserRegistrationResponse{
+		Data: res,
 	})
 }

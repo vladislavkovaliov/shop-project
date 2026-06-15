@@ -69,6 +69,11 @@ export class Products {
     defaultValue: { items: [], total: 0, page: 0, pageSize: 5 },
   });
 
+  readonly revenueStatsResource = rxResource({
+    stream: () => this.productService.getRevenueStats(),
+    defaultValue: { totalRevenue: 0, totalProductsSold: 0, averageOrderValue: 0},
+  });
+
   protected onProductPage(event: PageEvent): void {
     this.productPageIndex.set(event.pageIndex);
     this.productPageSize.set(event.pageSize);

@@ -11,6 +11,11 @@ type UserWithPurchases struct {
 	purchases int
 }
 
+type UserWithTotalSpent struct {
+	User
+	totalSpent float64
+}
+
 type UserByMostExpensiveProduct struct {
 	User
 }
@@ -31,6 +36,10 @@ func (u *UserWithPurchases) Purchases() int {
 	return u.purchases
 }
 
+func (u *UserWithTotalSpent) TotalSpent() float64 {
+	return u.totalSpent
+}
+
 func NewUser(id int64, name string, email string) *User {
 	return &User{id: id, name: name, email: email}
 }
@@ -45,5 +54,12 @@ func NewUserWithPurchases(id int64, name string, email string, purchases int) *U
 func NewUserByMostExpensiveProduct(id int64, name string, email string) *UserByMostExpensiveProduct {
 	return &UserByMostExpensiveProduct{
 		User: User{id: id, name: name, email: email},
+	}
+}
+
+func NewUserWithTotalSpent(id int64, name string, email string, totalSpent float64) *UserWithTotalSpent {
+	return &UserWithTotalSpent{
+		User:       User{id: id, name: name, email: email},
+		totalSpent: totalSpent,
 	}
 }

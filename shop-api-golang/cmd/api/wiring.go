@@ -28,7 +28,7 @@ func setupRouter(pool *pgxpool.Pool, producer *events.Producer) *gin.Engine {
 		wireProducts(api, pool)
 		wireOrders(api, pool, producer)
 		wireCategories(api, pool)
-		wireUsers(api, pool)
+		wireUsers(api, pool, producer)
 	}
 
 	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -44,6 +44,7 @@ func wireProducts(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 	rg.POST("/products", h.CreateProduct)
 	rg.GET("/products/cursor", h.ListCursorProducts)
 	rg.GET("/products/revenue-report", h.ListRevenueReport)
+	rg.GET("/products/revenue-stats", h.GetRevenueStats)
 }
 
 func wireOrders(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer) {
@@ -72,11 +73,13 @@ func wireCategories(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 	rg.GET("/categories/stats", h.GetCategoryStats)
 }
 
-func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool) {
+func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer) {
 	repo := userrepo.NewPgxRepository(pool)
-	svc := userservice.New(repo)
+	svc := userservice.New(repo, producer)
 	h := handlers.NewUserHandler(svc)
 
+	rg.GET("/users/daily-registrations", h.ListDailyUserRegistration)
+	rg.POST("/users", h.CreateUser)
 	rg.GET("/users", h.ListUsers)
 	rg.GET("/users/cursor", h.ListCursorUsers)
 	rg.GET("/users/search", h.Search)

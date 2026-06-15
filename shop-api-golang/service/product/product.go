@@ -49,3 +49,7 @@ func (s *Service) Create(ctx context.Context, title string, price float64, categ
 func (s *Service) ListRevenueReport(ctx context.Context, limit int, offset int) ([]*proddomain.RevenueReport, error) {
 	return s.repo.ListRevenueReport(ctx, limit, offset)
 }
+
+func (s *Service) GetRevenueStats(ctx context.Context) (*proddomain.RevenueStats, error) {
+	return s.repo.GetRevenueStats(ctx)
+}

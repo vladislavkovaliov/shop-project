@@ -447,6 +447,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/products/revenue-stats": {
+            "get": {
+                "description": "Returns revenue stasts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Get revenue stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RevenueStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Returns all users from the database",
@@ -476,6 +496,56 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.ListUserResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new user and publishes UserCreated event to Kafka",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create a user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -535,6 +605,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/daily-registrations": {
+            "get": {
+                "description": "Returns user registration count for today",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get daily user registration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DailyUserRegistrationResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/search": {
             "get": {
                 "description": "Search users by field (partial match)",
@@ -577,19 +676,19 @@ const docTemplate = `{
         },
         "/users/top-3-users": {
             "get": {
-                "description": "Returns top 3 users with the highest number of purchases",
+                "description": "Returns top 3 users with the highest number of total spent",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "users"
                 ],
-                "summary": "Get top 3 users by purchases",
+                "summary": "Get top 3 users by total spent",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ListUserWithPurchasesResponse"
+                            "$ref": "#/definitions/dto.ListUserWithTotalResponse"
                         }
                     }
                 }
@@ -734,6 +833,21 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateUserRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CursorProductsResponse": {
             "type": "object",
             "required": [
@@ -804,6 +918,21 @@ const docTemplate = `{
                 "revenue": {
                     "type": "number",
                     "example": 120
+                }
+            }
+        },
+        "dto.DailyUserRegistrationResponse": {
+            "type": "object",
+            "required": [
+                "count",
+                "createdAt"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
                 }
             }
         },
@@ -1002,7 +1131,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ListUserWithPurchasesResponse": {
+        "dto.ListUserWithTotalResponse": {
             "type": "object",
             "required": [
                 "data",
@@ -1012,7 +1141,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.UserWithPurchases"
+                        "$ref": "#/definitions/dto.UserWithTotalSpent"
                     }
                 },
                 "total": {
@@ -1111,6 +1240,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RevenueStatsResponse": {
+            "type": "object",
+            "required": [
+                "averageOrderValue",
+                "totalProductsSold",
+                "totalRevenue"
+            ],
+            "properties": {
+                "averageOrderValue": {
+                    "type": "number",
+                    "example": 123.123
+                },
+                "totalProductsSold": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "totalRevenue": {
+                    "type": "number",
+                    "example": 123.123
+                }
+            }
+        },
         "dto.StatsOrderResponse": {
             "type": "object",
             "required": [
@@ -1188,13 +1339,13 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UserWithPurchases": {
+        "dto.UserWithTotalSpent": {
             "type": "object",
             "required": [
                 "email",
                 "id",
                 "name",
-                "purchases"
+                "totalSpent"
             ],
             "properties": {
                 "email": {
@@ -1209,9 +1360,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "username"
                 },
-                "purchases": {
-                    "type": "integer",
-                    "example": 1
+                "totalSpent": {
+                    "type": "number",
+                    "example": 123.123
                 }
             }
         },

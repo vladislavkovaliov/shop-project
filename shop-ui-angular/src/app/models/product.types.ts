@@ -15,3 +15,10 @@ export interface Growth {
   value: number;
   sign: string;
 }
+
+
+export interface RevenueStats {
+  totalRevenue: number;
+  averageOrderValue: number;
+  totalProductsSold: number;
+}

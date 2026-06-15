@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs';
 import type { Observable } from 'rxjs';
-import type { Product, ProductRevenue } from '@app/models/product.types';
+import type { Product, ProductRevenue, RevenueStats } from '@app/models/product.types';
 import type { PaginatedResponse } from '@app/models/order.types';
-import type { DtoListProductResponse, DtoListRevenueReportResponse } from 'src/lib/types/api';
+import type { DtoListProductResponse, DtoListRevenueReportResponse, DtoRevenueStatsResponse } from 'src/lib/types/api';
 import { mapProducts, mapProductRevenue } from './product.mapper';
 
 @Injectable()
@@ -13,6 +13,7 @@ export class ProductService {
 
   static getProductsUrl = '/api/products';
   static getRevenueUrl = '/api/products/revenue-report';
+  static getRevenueStatsUrl = '/api/products/revenue-stats';
 
   getProducts(page: number, pageSize: number): Observable<PaginatedResponse<Product>> {
     const offset = page * pageSize;
@@ -40,5 +41,9 @@ export class ProductService {
         return { items, total, page, pageSize };
       }),
     );
+  }
+
+  getRevenueStats(): Observable<RevenueStats> {
+    return this.http.get<DtoRevenueStatsResponse>(ProductService.getRevenueStatsUrl);
   }
 }

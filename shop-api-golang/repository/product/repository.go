@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"math"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -177,4 +178,30 @@ func (r *PgxRepository) ListRevenueReport(ctx context.Context, limit int, offset
 	}
 
 	return totalRevenues, rows.Err()
+}
+
+func (r *PgxRepository) GetRevenueStats(ctx context.Context) (*proddomain.RevenueStats, error) {
+	var totalRevenue float64
+	var averageOrderValue float64
+	var totalProductsSold int64
+
+	err := r.pool.QueryRow(ctx, `
+		SELECT
+		COALESCE(SUM(oi.quantity * p.price), 0) AS total_revenue,
+		COALESCE(SUM(oi.quantity * p.price), 0) / NULLIF(COUNT(DISTINCT o.id), 0) AS avg_order_value,
+		COALESCE(SUM(oi.quantity), 0) AS total_products_sold
+		FROM order_items oi
+		JOIN products p ON p.id = oi.product_id
+		JOIN orders o ON o.id = oi.order_id
+	`).Scan(&totalRevenue, &averageOrderValue, &totalProductsSold)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return proddomain.NewRevenueStats(
+		math.Round(totalRevenue*100)/100,
+		math.Round(averageOrderValue*100)/100,
+		totalProductsSold,
+	), err
 }

@@ -177,6 +177,15 @@ export interface DtoRevenueReportResponse {
   title: string;
 }
 
+export interface DtoRevenueStatsResponse {
+  /** @example 123.123 */
+  averageOrderValue: number;
+  /** @example 123 */
+  totalProductsSold: number;
+  /** @example 123.123 */
+  totalRevenue: number;
+}
+
 export interface DtoStatsOrderResponse {
   /** @example 1.3 */
   averageCheck: number;
@@ -307,6 +316,8 @@ export interface RevenueReportListParams {
 }
 
 export type RevenueReportListData = DtoListRevenueReportResponse;
+
+export type RevenueStatsListData = DtoRevenueStatsResponse;
 
 export interface UsersListParams {
   /** Number of users to return (default 10) */

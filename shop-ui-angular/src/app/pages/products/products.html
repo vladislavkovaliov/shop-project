@@ -67,13 +67,26 @@
   <mat-tab label="Revenue Report">
     <div class="mt-4 space-y-6">
       <div class="grid grid-cols-3 gap-6">
-        @for (stat of revenueStats; track stat.label) {
+        <!-- @for (stat of revenueStats; track stat.label) {
           <app-stat-card
             [label]="stat.label"
             [value]="stat.value"
             [mock]="true"
           />
-        }
+        } -->
+
+        <app-stat-card
+            label="Total Revenue"
+            [value]="formatCurrency(revenueStatsResource.value().totalRevenue)"
+        />
+        <app-stat-card
+          label="Avg Order Value"
+          [value]="formatCurrency(revenueStatsResource.value().averageOrderValue)"
+        />
+        <app-stat-card
+          label="Total Products Sold"
+          [value]="revenueStatsResource.value().totalProductsSold"
+        />
       </div>
 
       @if (revenueResource.isLoading()) {

@@ -35,6 +35,20 @@ func (p *Producer) PublishOrderCreated(ctx context.Context, event OrderCreated) 
 	})
 }
 
+func (p *Producer) PublishUserCreated(ctx context.Context, event UserCreated) error {
+	value, err := json.Marshal(event)
+
+	if err != nil {
+		return fmt.Errorf("marshal event: %w", err)
+	}
+
+	return p.writer.WriteMessages(ctx, kafka.Message{
+		Topic: "user.events",
+		Key:   []byte(fmt.Sprintf("%d", event.UserID)),
+		Value: value,
+	})
+}
+
 func (p *Producer) Close() error {
 	return p.writer.Close()
 }
