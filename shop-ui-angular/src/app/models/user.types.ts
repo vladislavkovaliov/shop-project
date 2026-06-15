@@ -8,5 +8,5 @@ export interface UserWithPurchases {
   id: number;
   name: string;
   email: string;
-  purchases: number;
+  totalSpent: number;
 }

@@ -2,6 +2,7 @@ package category
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -27,6 +28,7 @@ func (r *PgxRepository) Count(ctx context.Context) (int, error) {
 }
 
 func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*categorydomain.Category, error) {
+	fmt.Println(1)
 	rows, err := r.pool.Query(ctx, "SELECT id, title, slug, created_at FROM categories LIMIT $1 OFFSET $2", limit, offset)
 
 	if err != nil {
@@ -59,6 +61,8 @@ func (r *PgxRepository) CountCategoryRevenue(ctx context.Context) (int, error) {
 }
 
 func (r *PgxRepository) ListCategoryRevenue(ctx context.Context, limit int, offset int) ([]*categorydomain.CategoryRevenue, error) {
+	fmt.Println(1)
+
 	rows, err := r.pool.Query(ctx, `
 		SELECT
 			c.title,

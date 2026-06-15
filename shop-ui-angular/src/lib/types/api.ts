@@ -60,6 +60,11 @@ export interface DtoCreateProductRequest {
   title?: string;
 }
 
+export interface DtoCreateUserRequest {
+  email: string;
+  name: string;
+}
+
 export interface DtoCursorProductsResponse {
   next_cursor: number;
   products: DtoProductResponse[];
@@ -82,6 +87,11 @@ export interface DtoDailyStatResponse {
   orders: number;
   /** @example 120 */
   revenue: number;
+}
+
+export interface DtoDailyUserRegistrationResponse {
+  count: number;
+  createdAt: string;
 }
 
 export interface DtoGrowthResponse {
@@ -139,8 +149,8 @@ export interface DtoListUserResponse {
   total: number;
 }
 
-export interface DtoListUserWithPurchasesResponse {
-  data: DtoUserWithPurchases[];
+export interface DtoListUserWithTotalResponse {
+  data: DtoUserWithTotalSpent[];
   total: number;
 }
 
@@ -218,15 +228,15 @@ export interface DtoUserResponse {
   name: string;
 }
 
-export interface DtoUserWithPurchases {
+export interface DtoUserWithTotalSpent {
   /** @example "text@gmail.com" */
   email: string;
   /** @example 1 */
   id: number;
   /** @example "username" */
   name: string;
-  /** @example 1 */
-  purchases: number;
+  /** @example 123.123 */
+  totalSpent: number;
 }
 
 export interface DtoWidgetStatsResponse {
@@ -328,6 +338,8 @@ export interface UsersListParams {
 
 export type UsersListData = DtoListUserResponse;
 
+export type UsersCreateData = DtoUserResponse;
+
 export type ByMostExpensiveProductListData =
   DtoListUserByMostExpensiveProductResponse;
 
@@ -340,6 +352,8 @@ export interface CursorListParams2 {
 
 export type CursorListResult = DtoCursorUserResponse;
 
+export type DailyRegistrationsListData = DtoDailyUserRegistrationResponse;
+
 export interface SearchListParams {
   /** Field to search by */
   field: "email" | "name";
@@ -349,4 +363,4 @@ export interface SearchListParams {
 
 export type SearchListData = DtoListUserResponse;
 
-export type Top3UsersListData = DtoListUserWithPurchasesResponse;
+export type Top3UsersListData = DtoListUserWithTotalResponse;

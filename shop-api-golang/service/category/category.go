@@ -55,4 +55,3 @@ func (s *Service) ListCategoryRevenue(ctx context.Context, limit int, offset int
 
 	return stats, total, nil
 }
-

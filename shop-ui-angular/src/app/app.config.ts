@@ -36,6 +36,8 @@ export const appConfig: ApplicationConfig = {
     USE_MOCK
       ? { provide: ProductService, useClass: MockProductService }
       : ProductService,
-    { provide: UserService, useClass: MockUserService },
+      USE_MOCK
+      ? { provide: UserService, useClass: MockUserService }
+      : UserService,
   ],
 };

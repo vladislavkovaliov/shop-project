@@ -23,9 +23,9 @@ const MOCK_USERS: User[] = [
 ];
 
 const MOCK_TOP3: UserWithPurchases[] = [
-  { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', purchases: 142500 },
-  { id: 4, name: 'Елена Смирнова', email: 'elena.sm@mail.ru', purchases: 128400 },
-  { id: 5, name: 'Дмитрий Петров', email: 'dima_ptr@yandex.ru', purchases: 98200 },
+  { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', totalSpent: 142500 },
+  { id: 4, name: 'Елена Смирнова', email: 'elena.sm@mail.ru', totalSpent: 128400 },
+  { id: 5, name: 'Дмитрий Петров', email: 'dima_ptr@yandex.ru', totalSpent: 98200 },
 ];
 
 const MOCK_PREMIUM: User[] = [
