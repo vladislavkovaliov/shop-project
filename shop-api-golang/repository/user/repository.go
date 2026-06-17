@@ -99,7 +99,14 @@ func (r *PgxRepository) Search(ctx context.Context, field string, value string) 
 		return nil, fmt.Errorf("invalid search field: %s", field)
 	}
 
-	query := fmt.Sprintf("SELECT id, name, email FROM users WHERE %s ILIKE '%%' || $1 || '%%'", col)
+	var query string
+
+	switch col {
+	case "name":
+		query = "SELECT id, name, email FROM users WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)"
+	case "email":
+		query = "SELECT id, name, email FROM users WHERE email ILIKE '%' || $1 || '%'"
+	}
 
 	rows, err := r.pool.Query(ctx, query, value)
 
