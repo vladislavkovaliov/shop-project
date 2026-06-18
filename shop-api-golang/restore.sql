@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict NKxVOLfDMDbHtfk5aQOwhcBpckS12hNRydjpnsTU4GwfRfhvfnNdUYISnbhv3qt
+\restrict JyL4iQGTKW0iAXDclj7zdnuI6Thjkk8GHH4cKA7b1UQKIra3LDclh5J7BgtA58v
 
 -- Dumped from database version 18.4 (Debian 18.4-1.pgdg13+1)
 -- Dumped by pg_dump version 18.4 (Debian 18.4-1.pgdg13+1)
@@ -10602,5 +10602,5 @@ ALTER TABLE ONLY public.orders
 -- PostgreSQL database dump complete
 --
 
-\unrestrict NKxVOLfDMDbHtfk5aQOwhcBpckS12hNRydjpnsTU4GwfRfhvfnNdUYISnbhv3qt
+\unrestrict JyL4iQGTKW0iAXDclj7zdnuI6Thjkk8GHH4cKA7b1UQKIra3LDclh5J7BgtA58v
 
