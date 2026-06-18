@@ -82,6 +82,7 @@ func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Produce
 	rg.GET("/users/daily-registrations", h.ListDailyUserRegistration)
 	rg.POST("/users", h.CreateUser)
 	rg.GET("/users", h.ListUsers)
+	rg.GET("/users/count", h.CountUser)
 	rg.GET("/users/cursor", h.ListCursorUsers)
 	rg.GET("/users/search", h.Search)
 	rg.GET("/users/top-3-users", h.ListTop3Users)

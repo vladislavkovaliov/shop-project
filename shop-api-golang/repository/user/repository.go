@@ -25,7 +25,9 @@ func NewPgxRepository(pool *pgxpool.Pool) *PgxRepository {
 
 func (r *PgxRepository) Count(ctx context.Context) (int, error) {
 	var total int
+
 	err := r.pool.QueryRow(ctx, "SELECT COUNT(*) FROM users").Scan(&total)
+
 	return total, err
 }
 

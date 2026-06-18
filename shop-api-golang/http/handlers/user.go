@@ -20,6 +20,30 @@ func NewUserHandler(service *userservice.Service) *UserHandler {
 	return &UserHandler{service: service}
 }
 
+// CountUsers godoc
+//
+//	@Summary		Count all users
+//	@Description	Returns count users from the database
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	dto.CountResponse
+//	@Router			/users/count [get]
+func (h *UserHandler) CountUser(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	total, err := h.service.Count(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.CountResponse{
+		Count: total,
+	})
+}
+
 // ListUsers godoc
 //
 //	@Summary		List all users
@@ -67,7 +91,6 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 		Data:  res,
 		Total: total,
 	})
-
 }
 
 // ListCursorUsers godoc

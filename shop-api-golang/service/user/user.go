@@ -16,6 +16,16 @@ func New(repo userdomain.Repository, producer *events.Producer) *Service {
 	return &Service{repo: repo, producer: producer}
 }
 
+func (s *Service) Count(ctx context.Context) (int, error) {
+	total, err := s.repo.Count(ctx)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return total, err
+}
+
 func (s *Service) List(ctx context.Context, limit int, offset int) ([]*userdomain.User, int, error) {
 	products, err := s.repo.List(ctx, limit, offset)
 	if err != nil {

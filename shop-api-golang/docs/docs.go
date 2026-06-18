@@ -571,6 +571,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/count": {
+            "get": {
+                "description": "Returns count users from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Count all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CountResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/cursor": {
             "get": {
                 "description": "Returns users with cursor-based pagination. Pass the last user ID from the previous response as cursor.",
@@ -762,6 +782,18 @@ const docTemplate = `{
                 },
                 "revenue": {
                     "type": "number"
+                }
+            }
+        },
+        "dto.CountResponse": {
+            "type": "object",
+            "required": [
+                "count"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

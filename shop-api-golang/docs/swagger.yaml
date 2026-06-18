@@ -49,6 +49,14 @@ definitions:
     - products
     - revenue
     type: object
+  dto.CountResponse:
+    properties:
+      count:
+        example: 1
+        type: integer
+    required:
+    - count
+    type: object
   dto.CreateOrderItem:
     properties:
       product_id:
@@ -841,6 +849,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.ListUserByMostExpensiveProductResponse'
       summary: Get users by the most expensive product
+      tags:
+      - users
+  /users/count:
+    get:
+      description: Returns count users from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CountResponse'
+      summary: Count all users
       tags:
       - users
   /users/cursor:

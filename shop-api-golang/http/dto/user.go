@@ -2,6 +2,10 @@ package dto
 
 import "time"
 
+type CountResponse struct {
+	Count int `json:"count" example:"1" binding:"required"`
+}
+
 type UserResponse struct {
 	ID    int64  `json:"id" example:"1" binding:"required"`
 	Name  string `json:"name" example:"username" binding:"required"`
