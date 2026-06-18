@@ -15,7 +15,8 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id    SERIAL PRIMARY KEY,
     name  TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL
+    email TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE products (
@@ -61,13 +62,16 @@ CREATE TABLE daily_user_registrations (
 );
 
 -- 2. Пользователи
-INSERT INTO users (name, email) VALUES
-('Alice Johnson', 'alice@example.com'),
-('Bob Smith',     'bob@example.com'),
-('Charlie Brown', 'charlie@example.com'),
-('Diana Prince',  'diana@example.com'),
-('Ethan Hunt',    'ethan@example.com'),
-('Ghost User',    'ghost@example.com');
+INSERT INTO users (name, email, created_at)
+SELECT name, email, NOW() - random() * interval '30 days'
+FROM (VALUES
+    ('Alice Johnson', 'alice@example.com'),
+    ('Bob Smith',     'bob@example.com'),
+    ('Charlie Brown', 'charlie@example.com'),
+    ('Diana Prince',  'diana@example.com'),
+    ('Ethan Hunt',    'ethan@example.com'),
+    ('Ghost User',    'ghost@example.com')
+) AS u(name, email);
 
 -- 3. Товары
 INSERT INTO products (title, price) VALUES
@@ -125,3 +129,10 @@ ON CONFLICT DO NOTHING;
 
 -- 8. Индекс для обучения
 CREATE INDEX IF NOT EXISTS idx_products_price ON products (price);
+
+-- 9. Заполнение daily_user_registrations из created_at пользователей
+INSERT INTO daily_user_registrations (created_at, count)
+SELECT created_at::date, COUNT(*)
+FROM users
+GROUP BY created_at::date
+ON CONFLICT (created_at) DO NOTHING;
