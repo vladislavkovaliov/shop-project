@@ -58,7 +58,9 @@ func wireOrders(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Produc
 	rg.POST("/orders", h.CreateOrder)
 	rg.GET("/orders/daily-purchases", h.ListDailyPurchases)
 	rg.GET("/orders/daily-stats", h.GetDailyStats)
+	rg.GET("/orders/trend", h.GetOrdersTrend)
 	rg.GET("/orders/:orderID/items", h.GetOrderItems)
+	rg.GET("/orders/count", h.CountOrders)
 }
 
 func wireCategories(rg *gin.RouterGroup, pool *pgxpool.Pool) {
@@ -87,5 +89,5 @@ func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Produce
 	rg.GET("/users/search", h.Search)
 	rg.GET("/users/top-3-users", h.ListTop3Users)
 	rg.GET("/users/by-most-expensive-product", h.ListUserByMostExpensiveProduct)
-
+	rg.GET("/users/registration-trend", h.GetUserRegistrationTrend)
 }

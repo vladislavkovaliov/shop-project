@@ -6,6 +6,7 @@ import (
 	"math"
 	"time"
 
+	"shop-api/domain/growth"
 	orderdomain "shop-api/domain/order"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -250,6 +251,29 @@ func (r *PgxRepository) GetAverageCheck(ctx context.Context) (float64, error) {
 	}
 
 	return math.Round(averageCheck*100) / 100, err
+}
+
+func (r *PgxRepository) GetOrdersTrend(ctx context.Context) (*orderdomain.OrdersTrend, error) {
+	var currentPeriod int
+	var previousPeriod int
+
+	err := r.pool.QueryRow(ctx, `
+		SELECT
+			COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END), 0) as current_period,
+			COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '28 days' AND created_at < NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END), 0) as previous_period
+		FROM orders
+		WHERE created_at >= NOW() - INTERVAL '28 days'
+	`).Scan(&currentPeriod, &previousPeriod)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return orderdomain.NewOrdersTrend(
+		currentPeriod,
+		previousPeriod,
+		growth.CalculateGrowth(float64(currentPeriod), float64(previousPeriod)),
+	), err
 }
 
 func (r *PgxRepository) GetDailyStats(ctx context.Context, limit int, offset int) ([]*orderdomain.DailyStats, error) {

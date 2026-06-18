@@ -347,6 +347,15 @@ definitions:
     - id
     - user_id
     type: object
+  dto.OrdersTrendResponse:
+    properties:
+      currentPeriod:
+        type: integer
+      growth:
+        $ref: '#/definitions/dto.GrowthResponse'
+      previousPeriod:
+        type: integer
+    type: object
   dto.ProductResponse:
     properties:
       category:
@@ -434,6 +443,15 @@ definitions:
     - email
     - id
     - name
+    type: object
+  dto.UserRegistrationTrendResponse:
+    properties:
+      currentPeriod:
+        type: integer
+      growth:
+        $ref: '#/definitions/dto.GrowthResponse'
+      previousPeriod:
+        type: integer
     type: object
   dto.UserResponse:
     properties:
@@ -627,6 +645,19 @@ paths:
       summary: Get order items
       tags:
       - orders
+  /orders/count:
+    get:
+      description: Returns count orders from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CountResponse'
+      summary: Count all orders
+      tags:
+      - orders
   /orders/daily-purchases:
     get:
       description: Returns all orders from the database
@@ -673,6 +704,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.StatsOrderResponse'
       summary: Statitstics all orders
+      tags:
+      - orders
+  /orders/trend:
+    get:
+      description: Returns orders trend
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrdersTrendResponse'
+      summary: Get orders trend
       tags:
       - orders
   /products:
@@ -904,6 +948,19 @@ paths:
               type: string
             type: object
       summary: Get daily user registration
+      tags:
+      - users
+  /users/registration-trend:
+    get:
+      description: Returns users trend
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserRegistrationTrendResponse'
+      summary: Get users trend
       tags:
       - users
   /users/search:

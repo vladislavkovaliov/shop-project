@@ -2,10 +2,6 @@ package dto
 
 import "time"
 
-type CountResponse struct {
-	Count int `json:"count" example:"1" binding:"required"`
-}
-
 type UserResponse struct {
 	ID    int64  `json:"id" example:"1" binding:"required"`
 	Name  string `json:"name" example:"username" binding:"required"`
@@ -32,9 +28,20 @@ type UserByMostExpensiveProduct struct {
 	Email string `json:"email" example:"text@gmail.com" binding:"required"`
 }
 
-type ListUserResponse struct {
-	Data  []UserResponse `json:"data" binding:"required"`
-	Total int            `json:"total" binding:"required"`
+type UserRegistrationTrendResponse struct {
+	CurrentPeriod  int            `json:"currentPeriod"`
+	PreviousPeriod int            `json:"previousPeriod"`
+	Growth         GrowthResponse `json:"growth"`
+}
+
+type CreateUserRequest struct {
+	Name  string `json:"name" binding:"required"`
+	Email string `json:"email" binding:"required"`
+}
+
+type DailyUserRegistrationResponse struct {
+	CreatedAt time.Time `json:"createdAt" binding:"required"`
+	Count     int       `json:"count" binding:"required"`
 }
 
 type CursorUserResponse struct {
@@ -57,14 +64,9 @@ type ListUserByMostExpensiveProductResponse struct {
 	Total int                          `json:"total" binding:"required"`
 }
 
-type CreateUserRequest struct {
-	Name  string `json:"name" binding:"required"`
-	Email string `json:"email" binding:"required"`
-}
-
-type DailyUserRegistrationResponse struct {
-	CreatedAt time.Time `json:"createdAt" binding:"required"`
-	Count     int       `json:"count" binding:"required"`
+type ListUserResponse struct {
+	Data  []UserResponse `json:"data" binding:"required"`
+	Total int            `json:"total" binding:"required"`
 }
 
 type ListDailyUserRegistrationResponse struct {

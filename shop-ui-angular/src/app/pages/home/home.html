@@ -1,14 +1,14 @@
 <h1 class="text-2xl font-semibold text-zinc-900 mb-6">Dashboard Overview</h1>
 
 <div class="grid grid-cols-2 gap-6">
-  @for (card of stats; track card.label) {
+  @for (card of statCards(); track card.label) {
     <app-stat-card
       [icon]="card.icon"
       [label]="card.label"
       [value]="card.value"
       [trend]="card.trend"
       [trendUp]="card.trendUp"
-      [mock]="true"
+      [mock]="homeStatsResource.isLoading()"
     />
   }
 </div>

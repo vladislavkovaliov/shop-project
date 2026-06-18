@@ -53,6 +53,12 @@ type CreateOrderResponse struct {
 	Items     []OrderItemResponse `json:"items" binding:"required"`
 }
 
+type OrdersTrendResponse struct {
+	CurrentPeriod  int            `json:"currentPeriod"`
+	PreviousPeriod int            `json:"previousPeriod"`
+	Growth         GrowthResponse `json:"growth"`
+}
+
 type DailyStatResponse struct {
 	Date    time.Time `json:"date" example:"2026-05-11 01:45:24.864701" binding:"required"`
 	Orders  int       `json:"orders" example:"1" binding:"required"`

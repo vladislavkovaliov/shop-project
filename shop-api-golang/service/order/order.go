@@ -110,6 +110,10 @@ func (s *Service) CountDailyStats(ctx context.Context) (int, error) {
 	return total, err
 }
 
+func (s *Service) GetOrdersTrend(ctx context.Context) (*orderdomain.OrdersTrend, error) {
+	return s.repo.GetOrdersTrend(ctx)
+}
+
 func (s *Service) GetDailyStats(ctx context.Context, limit int, offset int) ([]*orderdomain.DailyStats, int, error) {
 	dailyStats, err := s.repo.GetDailyStats(ctx, limit, offset)
 

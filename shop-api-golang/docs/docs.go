@@ -198,6 +198,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders/count": {
+            "get": {
+                "description": "Returns count orders from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Count all orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CountResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/orders/daily-purchases": {
             "get": {
                 "description": "Returns all orders from the database",
@@ -267,6 +287,26 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.StatsOrderResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/trend": {
+            "get": {
+                "description": "Returns orders trend",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get orders trend",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.OrdersTrendResponse"
                         }
                     }
                 }
@@ -649,6 +689,26 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/registration-trend": {
+            "get": {
+                "description": "Returns users trend",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get users trend",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserRegistrationTrendResponse"
                         }
                     }
                 }
@@ -1226,6 +1286,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.OrdersTrendResponse": {
+            "type": "object",
+            "properties": {
+                "currentPeriod": {
+                    "type": "integer"
+                },
+                "growth": {
+                    "$ref": "#/definitions/dto.GrowthResponse"
+                },
+                "previousPeriod": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.ProductResponse": {
             "type": "object",
             "required": [
@@ -1346,6 +1420,20 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "username"
+                }
+            }
+        },
+        "dto.UserRegistrationTrendResponse": {
+            "type": "object",
+            "properties": {
+                "currentPeriod": {
+                    "type": "integer"
+                },
+                "growth": {
+                    "$ref": "#/definitions/dto.GrowthResponse"
+                },
+                "previousPeriod": {
+                    "type": "integer"
                 }
             }
         },

@@ -45,8 +45,8 @@ func (s *Service) ListCursor(ctx context.Context, cursor int, limit int) ([]*use
 	return s.repo.ListCursor(ctx, cursor, limit)
 }
 
-func (s *Service) Search(ctx context.Context, field string, value string) ([]*userdomain.User, error) {
-	return s.repo.Search(ctx, field, value)
+func (s *Service) ListDailyUserRegistration(ctx context.Context) ([]*userdomain.DailyUserRegistration, error) {
+	return s.repo.ListDailyUserRegistration(ctx)
 }
 
 func (s *Service) ListTop3Users(ctx context.Context) ([]*userdomain.UserWithTotalSpent, error) {
@@ -74,6 +74,10 @@ func (s *Service) Create(ctx context.Context, name string, email string) (*userd
 	return user, nil
 }
 
-func (s *Service) ListDailyUserRegistration(ctx context.Context) ([]*userdomain.DailyUserRegistration, error) {
-	return s.repo.ListDailyUserRegistration(ctx)
+func (s *Service) Search(ctx context.Context, field string, value string) ([]*userdomain.User, error) {
+	return s.repo.Search(ctx, field, value)
+}
+
+func (s *Service) GetUserRegistrationTrend(ctx context.Context) (*userdomain.UserRegistrationTrend, error) {
+	return s.repo.GetUserRegistrationTrend(ctx)
 }

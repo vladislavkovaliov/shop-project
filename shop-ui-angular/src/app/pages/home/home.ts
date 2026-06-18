@@ -1,12 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { HomeService } from '@app/services/home/home.service';
+import type { Trend } from '@app/services/home/home.types';
 import { StatCard } from '@components/stat-card/stat-card';
 
 interface StatData {
   icon: string;
   label: string;
-  value: string;
+  value: string | number;
   trend: string;
   trendUp: boolean;
+}
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(value);
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
+function formatTrend(trend: Trend): string {
+  return `${trend.sign}${trend.value}%`;
 }
 
 @Component({
@@ -16,10 +35,54 @@ interface StatData {
   styleUrl: './home.css',
 })
 export class Home {
-  protected readonly stats: StatData[] = [
-    { icon: 'payments', label: 'Revenue', value: '$128,430.00', trend: '+12.5%', trendUp: true },
-    { icon: 'shopping_bag', label: 'Orders', value: '3,421', trend: '+8.2%', trendUp: true },
-    { icon: 'person_play', label: 'Users', value: '1,204', trend: '-2.1%', trendUp: false },
-    { icon: 'ads_click', label: 'Conversion', value: '3.24%', trend: '+4.3%', trendUp: true },
-  ];
+  private homeService = inject(HomeService);
+
+  readonly homeStatsResource = rxResource({
+    stream: () => this.homeService.getStats(),
+    defaultValue: {
+      users: 0,
+      orders: 0,
+      revenue: 0,
+      conversion: 0,
+      revenueTrend: { value: 0, sign: '+' },
+      ordersTrend: { value: 0, sign: '+' },
+      usersTrend: { value: 0, sign: '+' },
+      conversionTrend: { value: 0, sign: '+' },
+    },
+  });
+
+  protected readonly statCards = computed<StatData[]>(() => {
+    const stats = this.homeStatsResource.value();
+
+    return [
+      {
+        icon: 'payments',
+        label: 'Revenue',
+        value: formatCurrency(stats.revenue),
+        trend: formatTrend(stats.revenueTrend),
+        trendUp: stats.revenueTrend.sign === '+',
+      },
+      {
+        icon: 'shopping_bag',
+        label: 'Orders',
+        value: formatNumber(stats.orders),
+        trend: formatTrend(stats.ordersTrend),
+        trendUp: stats.ordersTrend.sign === '+',
+      },
+      {
+        icon: 'person_play',
+        label: 'Users',
+        value: formatNumber(stats.users),
+        trend: formatTrend(stats.usersTrend),
+        trendUp: stats.usersTrend.sign === '+',
+      },
+      {
+        icon: 'ads_click',
+        label: 'Conversion',
+        value: `${stats.conversion}%`,
+        trend: formatTrend(stats.conversionTrend),
+        trendUp: stats.conversionTrend.sign === '+',
+      },
+    ];
+  });
 }

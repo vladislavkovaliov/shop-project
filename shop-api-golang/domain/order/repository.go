@@ -21,4 +21,5 @@ type Repository interface {
 	GetTotalThisMonth(ctx context.Context) (float64, error)
 	GetAverageCheck(ctx context.Context) (float64, error)
 	GetDailyStats(ctx context.Context, limit int, offset int) ([]*DailyStats, error)
+	GetOrdersTrend(ctx context.Context) (*OrdersTrend, error)
 }

@@ -345,3 +345,33 @@ func (h *UserHandler) ListDailyUserRegistration(c *gin.Context) {
 		Data: res,
 	})
 }
+
+// GetUserRegistrationTrend godoc
+//
+//	@Summary		Get users trend
+//	@Description	Returns users trend
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	dto.UserRegistrationTrendResponse
+//	@Router			/users/registration-trend [get]
+func (h *UserHandler) GetUserRegistrationTrend(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+
+	defer cancel()
+
+	userRegistrationTrend, err := h.service.GetUserRegistrationTrend(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.UserRegistrationTrendResponse{
+		CurrentPeriod:  userRegistrationTrend.CurrentPeriod(),
+		PreviousPeriod: userRegistrationTrend.PreviousPeriod(),
+		Growth: dto.GrowthResponse{
+			Value: userRegistrationTrend.Growth().Value(),
+			Sign:  userRegistrationTrend.Growth().Sign(),
+		},
+	})
+}

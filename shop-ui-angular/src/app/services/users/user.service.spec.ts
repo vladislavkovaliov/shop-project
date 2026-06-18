@@ -21,13 +21,13 @@ const EXPECTED_USERS: User[] = [
 
 const RAW_TOP3_RESPONSE = {
   data: [
-    { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', purchases: 142500 },
+    { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', totalSpent: 142500 },
   ],
   total: 1,
 };
 
 const EXPECTED_TOP3: UserWithPurchases[] = [
-  { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', purchases: 142500 },
+  { id: 3, name: 'Александр Волков', email: 'volkov.a@example.com', totalSpent: 142500 },
 ];
 
 const RAW_PREMIUM_RESPONSE = {

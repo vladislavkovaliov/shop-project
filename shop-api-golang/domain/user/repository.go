@@ -15,4 +15,5 @@ type Repository interface {
 	ListDailyUserRegistration(ctx context.Context) ([]*DailyUserRegistration, error)
 	UpsertDailyUserRegistration(ctx context.Context, date time.Time) error
 	Create(ctx context.Context, name string, email string) (*User, error)
+	GetUserRegistrationTrend(ctx context.Context) (*UserRegistrationTrend, error)
 }

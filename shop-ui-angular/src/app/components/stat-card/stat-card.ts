@@ -13,5 +13,5 @@ export class StatCard {
   readonly value = input.required<string | number>();
   readonly trend = input<string>('');
   readonly trendUp = input<boolean>(true);
-  readonly mock = input(false);
+  readonly mock = input<boolean>(false);
 }

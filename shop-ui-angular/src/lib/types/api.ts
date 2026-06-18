@@ -34,6 +34,11 @@ export interface DtoCategoryRevenueResponse {
   revenue: number;
 }
 
+export interface DtoCountResponse {
+  /** @example 1 */
+  count: number;
+}
+
 export interface DtoCreateOrderItem {
   product_id?: number;
   quantity?: number;
@@ -170,6 +175,12 @@ export interface DtoOrderResponse {
   user_id: number;
 }
 
+export interface DtoOrdersTrendResponse {
+  currentPeriod?: number;
+  growth?: DtoGrowthResponse;
+  previousPeriod?: number;
+}
+
 export interface DtoProductResponse {
   /** @example "Electoronics" */
   category: string;
@@ -217,6 +228,12 @@ export interface DtoUserByMostExpensiveProduct {
   id: number;
   /** @example "username" */
   name: string;
+}
+
+export interface DtoUserRegistrationTrendResponse {
+  currentPeriod?: number;
+  growth?: DtoGrowthResponse;
+  previousPeriod?: number;
 }
 
 export interface DtoUserResponse {
@@ -278,6 +295,8 @@ export type OrdersListData = DtoListOrderResponse;
 
 export type OrdersCreateData = DtoCreateOrderResponse;
 
+export type CountListData = DtoCountResponse;
+
 export type DailyPurchasesListData = DtoListDailyPurchasesResponse;
 
 export interface DailyStatsListParams {
@@ -290,6 +309,8 @@ export interface DailyStatsListParams {
 export type DailyStatsListData = DtoListDailyStatResponse;
 
 export type StatsListResult = DtoStatsOrderResponse;
+
+export type TrendListData = DtoOrdersTrendResponse;
 
 export interface ItemsListParams {
   /** Order ID */
@@ -343,6 +364,8 @@ export type UsersCreateData = DtoUserResponse;
 export type ByMostExpensiveProductListData =
   DtoListUserByMostExpensiveProductResponse;
 
+export type CountListResult = DtoCountResponse;
+
 export interface CursorListParams2 {
   /** Number of users to return (default 10) */
   limit?: number;
@@ -353,6 +376,8 @@ export interface CursorListParams2 {
 export type CursorListResult = DtoCursorUserResponse;
 
 export type DailyRegistrationsListData = DtoDailyUserRegistrationResponse;
+
+export type RegistrationTrendListData = DtoUserRegistrationTrendResponse;
 
 export interface SearchListParams {
   /** Field to search by */

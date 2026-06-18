@@ -15,6 +15,8 @@ import { ProductService } from '@app/services/products/product.service';
 import { MockProductService } from '@app/services/products/product.service.mock';
 import { UserService } from '@app/services/users/user.service';
 import { MockUserService } from '@app/services/users/user.service.mock';
+import { HomeService } from '@app/services/home/home.service';
+import { MockHomeService } from '@app/services/home/home.service.mock';
 import { IS_MOCK } from '@app/tokens/is-mock.token';
 
 const USE_MOCK = false;
@@ -39,5 +41,8 @@ export const appConfig: ApplicationConfig = {
       USE_MOCK
       ? { provide: UserService, useClass: MockUserService }
       : UserService,
+    USE_MOCK
+      ? { provide: HomeService, useClass: MockHomeService }
+      : HomeService,
   ],
 };

@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"shop-api/domain/growth"
 	userdomain "shop-api/domain/user"
 )
 
@@ -70,47 +71,6 @@ func (r *PgxRepository) ListCursor(ctx context.Context, cursor int, limit int) (
 
 func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*userdomain.User, error) {
 	rows, err := r.pool.Query(ctx, "SELECT id, name, email FROM users LIMIT $1 OFFSET $2", limit, offset)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var users []*userdomain.User
-
-	for rows.Next() {
-		var id int64
-		var name string
-		var email string
-
-		if err := rows.Scan(&id, &name, &email); err != nil {
-			return nil, err
-		}
-
-		users = append(users, userdomain.NewUser(id, name, email))
-	}
-
-	return users, rows.Err()
-}
-
-func (r *PgxRepository) Search(ctx context.Context, field string, value string) ([]*userdomain.User, error) {
-	col, ok := allowedFields[field]
-
-	if !ok {
-		return nil, fmt.Errorf("invalid search field: %s", field)
-	}
-
-	var query string
-
-	switch col {
-	case "name":
-		query = "SELECT id, name, email FROM users WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)"
-	case "email":
-		query = "SELECT id, name, email FROM users WHERE email ILIKE '%' || $1 || '%'"
-	}
-
-	rows, err := r.pool.Query(ctx, query, value)
 
 	if err != nil {
 		return nil, err
@@ -214,27 +174,6 @@ func (r *PgxRepository) ListUserByMostExpensiveProduct(ctx context.Context) ([]*
 
 }
 
-func (r *PgxRepository) Create(ctx context.Context, name string, email string) (*userdomain.User, error) {
-	var userID int64
-
-	err := r.pool.QueryRow(ctx, "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id", name, email).Scan(&userID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return userdomain.NewUser(userID, name, email), err
-}
-
-func (r *PgxRepository) UpsertDailyUserRegistration(ctx context.Context, date time.Time) error {
-	_, err := r.pool.Exec(ctx, `
-		INSERT INTO daily_user_registrations (created_at, count) VALUES ($1, 1)
-		ON CONFLICT (created_at) DO UPDATE SET count = daily_user_registrations.count + 1
-	`, date)
-
-	return err
-}
-
 func (r *PgxRepository) ListDailyUserRegistration(ctx context.Context) ([]*userdomain.DailyUserRegistration, error) {
 	rows, err := r.pool.Query(ctx, "SELECT created_at, count FROM daily_user_registrations ORDER BY created_at DESC LIMIT 1")
 
@@ -261,4 +200,89 @@ func (r *PgxRepository) ListDailyUserRegistration(ctx context.Context) ([]*userd
 	}
 
 	return result, rows.Err()
+}
+
+func (r *PgxRepository) Search(ctx context.Context, field string, value string) ([]*userdomain.User, error) {
+	col, ok := allowedFields[field]
+
+	if !ok {
+		return nil, fmt.Errorf("invalid search field: %s", field)
+	}
+
+	var query string
+
+	switch col {
+	case "name":
+		query = "SELECT id, name, email FROM users WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)"
+	case "email":
+		query = "SELECT id, name, email FROM users WHERE email ILIKE '%' || $1 || '%'"
+	}
+
+	rows, err := r.pool.Query(ctx, query, value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var users []*userdomain.User
+
+	for rows.Next() {
+		var id int64
+		var name string
+		var email string
+
+		if err := rows.Scan(&id, &name, &email); err != nil {
+			return nil, err
+		}
+
+		users = append(users, userdomain.NewUser(id, name, email))
+	}
+
+	return users, rows.Err()
+}
+
+func (r *PgxRepository) Create(ctx context.Context, name string, email string) (*userdomain.User, error) {
+	var userID int64
+
+	err := r.pool.QueryRow(ctx, "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id", name, email).Scan(&userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return userdomain.NewUser(userID, name, email), err
+}
+
+func (r *PgxRepository) UpsertDailyUserRegistration(ctx context.Context, date time.Time) error {
+	_, err := r.pool.Exec(ctx, `
+		INSERT INTO daily_user_registrations (created_at, count) VALUES ($1, 1)
+		ON CONFLICT (created_at) DO UPDATE SET count = daily_user_registrations.count + 1
+	`, date)
+
+	return err
+}
+
+func (r *PgxRepository) GetUserRegistrationTrend(ctx context.Context) (*userdomain.UserRegistrationTrend, error) {
+	var currentPeriod int
+	var previousPeriod int
+
+	err := r.pool.QueryRow(ctx, `
+		SELECT
+			COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END), 0) as current_period,
+			COALESCE(SUM(CASE WHEN created_at >= NOW() - INTERVAL '28 days' AND created_at < NOW() - INTERVAL '14 days' THEN 1 ELSE 0 END), 0) as previous_period
+		FROM users
+		WHERE created_at >= NOW() - INTERVAL '28 days'
+	`).Scan(&currentPeriod, &previousPeriod)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return userdomain.NewUserRegistrationTrend(
+		currentPeriod,
+		previousPeriod,
+		growth.CalculateGrowth(float64(currentPeriod), float64(previousPeriod)),
+	), err
 }

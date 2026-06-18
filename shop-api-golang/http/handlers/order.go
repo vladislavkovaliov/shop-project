@@ -21,6 +21,30 @@ func NewOrderHandler(service *orderservice.Service) *OrderHandler {
 	return &OrderHandler{service: service}
 }
 
+// CountOrders godoc
+//
+//	@Summary		Count all orders
+//	@Description	Returns count orders from the database
+//	@Tags			orders
+//	@Produce		json
+//	@Success		200	{object}	dto.CountResponse
+//	@Router			/orders/count [get]
+func (h *OrderHandler) CountOrders(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	total, err := h.service.Count(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.CountResponse{
+		Count: total,
+	})
+}
+
 // StatsOrder godoc
 //
 //	@Summary		Statitstics all orders
@@ -247,6 +271,36 @@ func (h *OrderHandler) GetOrderItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
+}
+
+// GetOrdersTrend godoc
+//
+//	@Summary		Get orders trend
+//	@Description	Returns orders trend
+//	@Tags			orders
+//	@Produce		json
+//	@Success		200	{object}	dto.OrdersTrendResponse
+//	@Router			/orders/trend [get]
+func (h *OrderHandler) GetOrdersTrend(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+
+	defer cancel()
+
+	ordersTrend, err := h.service.GetOrdersTrend(ctx)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.OrdersTrendResponse{
+		CurrentPeriod:  ordersTrend.CurrentPeriod(),
+		PreviousPeriod: ordersTrend.PreviousPeriod(),
+		Growth: dto.GrowthResponse{
+			Value: ordersTrend.Growth().Value(),
+			Sign:  ordersTrend.Growth().Sign(),
+		},
+	})
 }
 
 // GetDailyStats godoc
