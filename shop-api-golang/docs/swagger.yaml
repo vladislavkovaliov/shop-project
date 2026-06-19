@@ -594,6 +594,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListOrderResponse'
+      security:
+      - BearerAuth: []
       summary: List all orders
       tags:
       - orders
@@ -621,6 +623,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new order
       tags:
       - orders
@@ -642,6 +646,8 @@ paths:
             items:
               $ref: '#/definitions/dto.OrderItemResponse'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get order items
       tags:
       - orders
@@ -668,6 +674,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListDailyPurchasesResponse'
+      security:
+      - BearerAuth: []
       summary: List all daily purchases
       tags:
       - orders
@@ -690,6 +698,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListDailyStatResponse'
+      security:
+      - BearerAuth: []
       summary: List daily stats
       tags:
       - orders
@@ -703,6 +713,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.StatsOrderResponse'
+      security:
+      - BearerAuth: []
       summary: Statitstics all orders
       tags:
       - orders
@@ -846,6 +858,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListUserResponse'
+      security:
+      - BearerAuth: []
       summary: List all users
       tags:
       - users
@@ -879,6 +893,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a user
       tags:
       - users
@@ -892,6 +908,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListUserByMostExpensiveProductResponse'
+      security:
+      - BearerAuth: []
       summary: Get users by the most expensive product
       tags:
       - users
@@ -928,6 +946,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.CursorUserResponse'
+      security:
+      - BearerAuth: []
       summary: List users (cursor-based)
       tags:
       - users
@@ -947,6 +967,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get daily user registration
       tags:
       - users
@@ -987,6 +1009,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListUserResponse'
+      security:
+      - BearerAuth: []
       summary: Search user by field
       tags:
       - users
@@ -1000,7 +1024,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.ListUserWithTotalResponse'
+      security:
+      - BearerAuth: []
       summary: Get top 3 users by total spent
       tags:
       - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

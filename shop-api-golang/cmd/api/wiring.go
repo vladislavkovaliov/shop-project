@@ -7,6 +7,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"shop-api/http/handlers"
+	"shop-api/http/middleware"
 	"shop-api/internal/events"
 	"shop-api/internal/rabbit"
 	categoryrepo "shop-api/repository/category"
@@ -49,17 +50,20 @@ func wireProducts(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 }
 
 func wireOrders(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer, rabbitProduct *rabbit.Producer) {
+	authMw := middleware.AuthMiddleware(pool)
+
 	repo := orderrepo.NewPgxRepository(pool)
 	svc := orderservice.New(repo, producer, rabbitProduct)
 	h := handlers.NewOrderHandler(svc)
 
-	rg.GET("/orders/stats", h.StatsOrder)
-	rg.GET("/orders", h.ListOrder)
-	rg.POST("/orders", h.CreateOrder)
-	rg.GET("/orders/daily-purchases", h.ListDailyPurchases)
-	rg.GET("/orders/daily-stats", h.GetDailyStats)
+	rg.GET("/orders/stats", authMw, h.StatsOrder)
+	rg.GET("/orders", authMw, h.ListOrder)
+	rg.POST("/orders", authMw, h.CreateOrder)
+	rg.GET("/orders/daily-purchases", authMw, h.ListDailyPurchases)
+	rg.GET("/orders/daily-stats", authMw, h.GetDailyStats)
+	rg.GET("/orders/:orderID/items", authMw, h.GetOrderItems)
+	// public dashboard endpoints
 	rg.GET("/orders/trend", h.GetOrdersTrend)
-	rg.GET("/orders/:orderID/items", h.GetOrderItems)
 	rg.GET("/orders/count", h.CountOrders)
 }
 
@@ -77,17 +81,20 @@ func wireCategories(rg *gin.RouterGroup, pool *pgxpool.Pool) {
 }
 
 func wireUsers(rg *gin.RouterGroup, pool *pgxpool.Pool, producer *events.Producer) {
+	authMw := middleware.AuthMiddleware(pool)
+
 	repo := userrepo.NewPgxRepository(pool)
 	svc := userservice.New(repo, producer)
 	h := handlers.NewUserHandler(svc)
 
-	rg.GET("/users/daily-registrations", h.ListDailyUserRegistration)
-	rg.POST("/users", h.CreateUser)
-	rg.GET("/users", h.ListUsers)
+	rg.GET("/users/daily-registrations", authMw, h.ListDailyUserRegistration)
+	rg.POST("/users", authMw, h.CreateUser)
+	rg.GET("/users", authMw, h.ListUsers)
+	rg.GET("/users/cursor", authMw, h.ListCursorUsers)
+	rg.GET("/users/search", authMw, h.Search)
+	rg.GET("/users/top-3-users", authMw, h.ListTop3Users)
+	rg.GET("/users/by-most-expensive-product", authMw, h.ListUserByMostExpensiveProduct)
+	// public dashboard endpoints
 	rg.GET("/users/count", h.CountUser)
-	rg.GET("/users/cursor", h.ListCursorUsers)
-	rg.GET("/users/search", h.Search)
-	rg.GET("/users/top-3-users", h.ListTop3Users)
-	rg.GET("/users/by-most-expensive-product", h.ListUserByMostExpensiveProduct)
 	rg.GET("/users/registration-trend", h.GetUserRegistrationTrend)
 }

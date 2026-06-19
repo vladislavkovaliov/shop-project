@@ -50,6 +50,7 @@ func (h *UserHandler) CountUser(c *gin.Context) {
 //	@Description	Returns all users from the database
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListUserResponse
 //	@Router			/users [get]
 //
@@ -99,6 +100,7 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 //	@Description	Returns users with cursor-based pagination. Pass the last user ID from the previous response as cursor.
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.CursorUserResponse
 //	@Router			/users/cursor [get]
 //
@@ -153,6 +155,7 @@ func (h *UserHandler) ListCursorUsers(c *gin.Context) {
 //	@Description	Search users by field (partial match)
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListUserResponse
 //	@Router			/users/search [get]
 //
@@ -204,6 +207,7 @@ func (h *UserHandler) Search(c *gin.Context) {
 //	@Description	Returns top 3 users with the highest number of total spent
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListUserWithTotalResponse
 //	@Router			/users/top-3-users [get]
 func (h *UserHandler) ListTop3Users(c *gin.Context) {
@@ -241,6 +245,7 @@ func (h *UserHandler) ListTop3Users(c *gin.Context) {
 //	@Description	Returns users by the most expensive product
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListUserByMostExpensiveProductResponse
 //	@Router			/users/by-most-expensive-product [get]
 func (h *UserHandler) ListUserByMostExpensiveProduct(c *gin.Context) {
@@ -278,6 +283,7 @@ func (h *UserHandler) ListUserByMostExpensiveProduct(c *gin.Context) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			body	body	dto.CreateUserRequest	true	"User data"
 //	@Success		201		{object}	dto.UserResponse
 //	@Failure		400		{object}	map[string]string
@@ -317,6 +323,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 //	@Description	Returns user registration count for today
 //	@Tags			users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.DailyUserRegistrationResponse
 //	@Failure		500	{object}	map[string]string
 //	@Router			/users/daily-registrations [get]

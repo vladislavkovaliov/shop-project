@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -10,10 +11,37 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: ['localhost'],
+});
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  next();
+});
+
+app.all(/^\/api\/auth\//, async (req, res) => {
+  try {
+    const { auth } = await import('./server/auth');
+    const { toNodeHandler } = await import('better-auth/node');
+    await toNodeHandler(auth)(req, res);
+  } catch (err) {
+    res.status(500).send('Auth error');
+  }
+});
 
 app.use('/api', async (req, res) => {
-  const target = `http://api:8080${req.originalUrl}`;
+  const apiUrl = process.env['API_URL'] || 'http://api:8080';
+  const target = `${apiUrl}${req.originalUrl}`;
 
   try {
     const response = await fetch(target, {

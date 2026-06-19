@@ -3,6 +3,10 @@
 // @description	Educational SQL workshop backend API
 // @host			localhost:8080
 // @BasePath		/api
+//
+// @securityDefinitions.apikey	BearerAuth
+// @in							header
+// @name						Authorization
 package main
 
 import (

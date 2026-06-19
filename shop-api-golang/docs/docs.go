@@ -125,6 +125,11 @@ const docTemplate = `{
         },
         "/orders": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns all orders from the database",
                 "produces": [
                     "application/json"
@@ -157,6 +162,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates an order and publishes order.created event to Kafka",
                 "consumes": [
                     "application/json"
@@ -220,6 +230,11 @@ const docTemplate = `{
         },
         "/orders/daily-purchases": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns all orders from the database",
                 "produces": [
                     "application/json"
@@ -240,6 +255,11 @@ const docTemplate = `{
         },
         "/orders/daily-stats": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns daily stats from the database",
                 "produces": [
                     "application/json"
@@ -274,6 +294,11 @@ const docTemplate = `{
         },
         "/orders/stats": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns statistics orders from the database",
                 "produces": [
                     "application/json"
@@ -314,6 +339,11 @@ const docTemplate = `{
         },
         "/orders/{orderID}/items": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns all items for a given order",
                 "produces": [
                     "application/json"
@@ -509,6 +539,11 @@ const docTemplate = `{
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns all users from the database",
                 "produces": [
                     "application/json"
@@ -541,6 +576,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new user and publishes UserCreated event to Kafka",
                 "consumes": [
                     "application/json"
@@ -593,6 +633,11 @@ const docTemplate = `{
         },
         "/users/by-most-expensive-product": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns users by the most expensive product",
                 "produces": [
                     "application/json"
@@ -633,6 +678,11 @@ const docTemplate = `{
         },
         "/users/cursor": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns users with cursor-based pagination. Pass the last user ID from the previous response as cursor.",
                 "produces": [
                     "application/json"
@@ -667,6 +717,11 @@ const docTemplate = `{
         },
         "/users/daily-registrations": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns user registration count for today",
                 "produces": [
                     "application/json"
@@ -716,6 +771,11 @@ const docTemplate = `{
         },
         "/users/search": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Search users by field (partial match)",
                 "produces": [
                     "application/json"
@@ -756,6 +816,11 @@ const docTemplate = `{
         },
         "/users/top-3-users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns top 3 users with the highest number of total spent",
                 "produces": [
                     "application/json"
@@ -1499,6 +1564,13 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

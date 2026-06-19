@@ -51,6 +51,7 @@ func (h *OrderHandler) CountOrders(c *gin.Context) {
 //	@Description	Returns statistics orders from the database
 //	@Tags			orders
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.StatsOrderResponse
 //	@Router			/orders/stats [get]
 func (h *OrderHandler) StatsOrder(c *gin.Context) {
@@ -92,6 +93,7 @@ func (h *OrderHandler) StatsOrder(c *gin.Context) {
 //	@Description	Returns all orders from the database
 //	@Tags			orders
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListOrderResponse
 //	@Router			/orders [get]
 //
@@ -141,6 +143,7 @@ func (h *OrderHandler) ListOrder(c *gin.Context) {
 //	@Description	Returns all orders from the database
 //	@Tags			orders
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListDailyPurchasesResponse
 //	@Router			/orders/daily-purchases [get]
 func (h *OrderHandler) ListDailyPurchases(c *gin.Context) {
@@ -177,6 +180,7 @@ func (h *OrderHandler) ListDailyPurchases(c *gin.Context) {
 //	@Tags			orders
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			body	body	dto.CreateOrderRequest	true	"Order data"
 //	@Success		201		{object}	dto.CreateOrderResponse
 //	@Failure		400		{object}	map[string]string
@@ -236,6 +240,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 //	@Description	Returns all items for a given order
 //	@Tags			orders
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{array}	dto.OrderItemResponse
 //	@Router			/orders/{orderID}/items [get]
 //
@@ -309,6 +314,7 @@ func (h *OrderHandler) GetOrdersTrend(c *gin.Context) {
 //	@Description	Returns daily stats from the database
 //	@Tags			orders
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Success		200	{object}	dto.ListDailyStatResponse
 //	@Router			/orders/daily-stats [get]
 //
