@@ -21,4 +21,5 @@ export class SidebarComponent {
     { icon: 'category', label: 'Categories', path: '/categories' },
     { icon: 'group', label: 'Users', path: '/users' },
   ];
+
 }

@@ -7,6 +7,7 @@ import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { API_BASE_URL } from '@app/tokens/api-base-url.token';
 import { apiBaseUrlInterceptor } from '@app/interceptors/api-base-url.interceptor';
+import { ssrCookieInterceptor } from '@app/interceptors/ssr-cookie.interceptor';
 import { OrderService } from '@app/services/orders/order.service';
 import { MockOrderService } from '@app/services/orders/order.service.mock';
 import { CategoryService } from '@app/services/categories/category.service';
@@ -26,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch(), withInterceptors([apiBaseUrlInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([ssrCookieInterceptor, apiBaseUrlInterceptor])),
     { provide: API_BASE_URL, useValue: environment.apiUrl },
     { provide: IS_MOCK, useValue: USE_MOCK },
     USE_MOCK

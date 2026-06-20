@@ -7,7 +7,9 @@ export const authGuard = async () => {
   if (isPlatformServer(inject(PLATFORM_ID))) {
     try {
       const req = inject(REQUEST) as any;
-      const cookies: string = req.headers?.cookie || '';
+
+
+      const cookies: string = req.headers.get('Cookie') || '';
       if (cookies.includes('better-auth.session_token')) {
         return true;
       }
