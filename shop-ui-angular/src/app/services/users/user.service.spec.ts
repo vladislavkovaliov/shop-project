@@ -5,6 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { UserService } from './user.service';
 import type { User, UserWithPurchases } from '@app/models/user.types';
 import type { PaginatedResponse } from '@app/models/order.types';
+import type { DtoCreateUserRequest, DtoUserResponse } from 'src/lib/types/api';
 
 const RAW_USERS_RESPONSE = {
   data: [
@@ -46,6 +47,7 @@ describe('UserService', () => {
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         UserService,
@@ -114,7 +116,7 @@ describe('UserService', () => {
   describe('getTop3Users', () => {
     it('should make GET request', () => {
       service.getTop3Users().subscribe();
-      const req = httpMock.expectOne('/api/users/top-3');
+      const req = httpMock.expectOne('/api/users/top-3-users');
       expect(req.request.method).toBe('GET');
       req.flush({ data: [], total: 0 });
     });
@@ -123,9 +125,39 @@ describe('UserService', () => {
       let result: UserWithPurchases[] | undefined;
 
       service.getTop3Users().subscribe(r => result = r);
-      httpMock.expectOne('/api/users/top-3').flush(RAW_TOP3_RESPONSE);
+      httpMock.expectOne('/api/users/top-3-users').flush(RAW_TOP3_RESPONSE);
 
       expect(result).toEqual(EXPECTED_TOP3);
+    });
+  });
+
+  describe('createUser', () => {
+    it('should POST to /api/users with name and email', () => {
+      const payload: DtoCreateUserRequest = { name: 'Test User', email: 'test@example.com' };
+      service.createUser(payload).subscribe();
+      const req = httpMock.expectOne('/api/users');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush({ id: 1, name: 'Test User', email: 'test@example.com' });
+    });
+
+    it('should return the created user', () => {
+      let result: DtoUserResponse | undefined;
+      service.createUser({ name: 'New User', email: 'new@test.com' }).subscribe(r => result = r);
+      httpMock.expectOne('/api/users').flush({ id: 16, name: 'New User', email: 'new@test.com' });
+      expect(result!.id).toBe(16);
+      expect(result!.name).toBe('New User');
+      expect(result!.email).toBe('new@test.com');
+    });
+
+    it('should propagate HTTP error', () => {
+      let error: unknown;
+      service.createUser({ name: '', email: '' }).subscribe({ error: e => error = e });
+      httpMock.expectOne('/api/users').flush(
+        { error: 'name is required' },
+        { status: 400, statusText: 'Bad Request' },
+      );
+      expect(error).toBeTruthy();
     });
   });
 

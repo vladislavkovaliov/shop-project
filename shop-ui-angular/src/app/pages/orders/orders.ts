@@ -79,7 +79,12 @@ export class Orders {
   }
 
   protected openCreateOrderDialog(): void {
-    this.dialog.open(CreateOrderDialog);
+    const dialogRef = this.dialog.open(CreateOrderDialog);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.ordersResource.reload();
+      }
+    });
   }
 
   protected formatCurrency(value: number): string {

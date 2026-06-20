@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { of, map } from 'rxjs';
+import { map } from 'rxjs';
 import type { Observable } from 'rxjs';
 import { type Order, type DailyPurchase, type OrderStats, type PaginatedResponse } from '@app/models/order.types';
 import { mapOrders } from './order.mapper';
-import { DtoListOrderResponse, DtoStatsOrderResponse, DtoListDailyStatResponse } from 'src/lib/types/api';
+import type { DtoCreateOrderRequest, DtoCreateOrderResponse, DtoListOrderResponse, DtoStatsOrderResponse, DtoListDailyStatResponse } from 'src/lib/types/api';
 
 @Injectable()
 export class OrderService {
@@ -54,8 +54,7 @@ export class OrderService {
     );
   }
 
-  createOrder(payload: Record<string, unknown>): Observable<Order> {
-    console.log('createOrder payload', payload);
-    return of({ id: '#NEW', userId: 0, createdAt: '' });
+  createOrder(data: DtoCreateOrderRequest): Observable<DtoCreateOrderResponse> {
+    return this.http.post<DtoCreateOrderResponse>(OrderService.getOrdersUrl, data);
   }
 }

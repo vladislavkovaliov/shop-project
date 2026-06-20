@@ -11,10 +11,18 @@ export interface AuthUser {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private sessionSignal = signal<{ user: AuthUser } | null | undefined>(undefined);
+  private initPromise: Promise<void> | null = null;
 
   readonly session = this.sessionSignal.asReadonly();
 
   async init() {
+    if (!this.initPromise) {
+      this.initPromise = this._init();
+    }
+    return this.initPromise;
+  }
+
+  private async _init() {
     try {
       const { data } = await authClient.getSession();
       this.sessionSignal.set(data);

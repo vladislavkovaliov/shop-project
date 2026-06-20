@@ -5,6 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ProductService } from './product.service';
 import type { Product, ProductRevenue } from '@app/models/product.types';
 import type { PaginatedResponse } from '@app/models/order.types';
+import type { DtoCreateProductRequest, DtoProductResponse } from 'src/lib/types/api';
 
 const RAW_PRODUCTS_RESPONSE = {
   data: [
@@ -108,17 +109,49 @@ describe('ProductService', () => {
     });
   });
 
+  describe('createProduct', () => {
+    it('should POST to /api/products with the request body', () => {
+      const payload: DtoCreateProductRequest = { title: 'New Product', price: 29.99 };
+      service.createProduct(payload).subscribe();
+      const req = httpMock.expectOne('/api/products');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush({ id: 1, title: 'New Product', price: 29.99, category: 'Electronics' });
+    });
+
+    it('should return the created product', () => {
+      const payload: DtoCreateProductRequest = { title: 'New Product', price: 29.99, category_id: 1 };
+      let result: DtoProductResponse | undefined;
+      service.createProduct(payload).subscribe(r => result = r);
+      httpMock.expectOne('/api/products').flush({ id: 1, title: 'New Product', price: 29.99, category: 'Electronics' });
+      expect(result!.id).toBe(1);
+      expect(result!.title).toBe('New Product');
+      expect(result!.price).toBe(29.99);
+      expect(result!.category).toBe('Electronics');
+    });
+
+    it('should propagate HTTP error', () => {
+      let error: unknown;
+      service.createProduct({ title: '', price: 0 }).subscribe({ error: e => error = e });
+      httpMock.expectOne('/api/products').flush(
+        { error: 'title is required' },
+        { status: 400, statusText: 'Bad Request' },
+      );
+      expect(error).toBeTruthy();
+    });
+  });
+
   describe('getProductRevenue', () => {
     it('should make GET request with limit and offset params', () => {
       service.getProductRevenue(0, 10).subscribe();
-      const req = httpMock.expectOne('/api/products/revenue?limit=10&offset=0');
+      const req = httpMock.expectOne('/api/products/revenue-report?limit=10&offset=0');
       expect(req.request.method).toBe('GET');
       req.flush({ data: [], total: 0 });
     });
 
     it('should compute offset for page 2', () => {
       service.getProductRevenue(2, 5).subscribe();
-      const req = httpMock.expectOne('/api/products/revenue?limit=5&offset=10');
+      const req = httpMock.expectOne('/api/products/revenue-report?limit=5&offset=10');
       expect(req.request.method).toBe('GET');
       req.flush({ data: [], total: 0 });
     });
@@ -127,7 +160,7 @@ describe('ProductService', () => {
       let result: PaginatedResponse<ProductRevenue> | undefined;
 
       service.getProductRevenue(0, 10).subscribe(r => result = r);
-      httpMock.expectOne('/api/products/revenue?limit=10&offset=0').flush(RAW_REVENUE_RESPONSE);
+      httpMock.expectOne('/api/products/revenue-report?limit=10&offset=0').flush(RAW_REVENUE_RESPONSE);
 
       expect(result!.items).toEqual(EXPECTED_REVENUE);
       expect(result!.total).toBe(2);
@@ -139,7 +172,7 @@ describe('ProductService', () => {
       let result: PaginatedResponse<ProductRevenue> | undefined;
 
       service.getProductRevenue(0, 10).subscribe(r => result = r);
-      httpMock.expectOne('/api/products/revenue?limit=10&offset=0').flush({ data: [], total: 0 });
+      httpMock.expectOne('/api/products/revenue-report?limit=10&offset=0').flush({ data: [], total: 0 });
 
       expect(result!.items).toEqual([]);
       expect(result!.total).toBe(0);
@@ -149,7 +182,7 @@ describe('ProductService', () => {
       let error: unknown;
 
       service.getProductRevenue(0, 10).subscribe({ error: e => error = e });
-      httpMock.expectOne('/api/products/revenue?limit=10&offset=0').flush(
+      httpMock.expectOne('/api/products/revenue-report?limit=10&offset=0').flush(
         { message: 'Server error' },
         { status: 500, statusText: 'Internal Server Error' },
       );

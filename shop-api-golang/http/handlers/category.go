@@ -52,7 +52,7 @@ func (h *CategoryHandler) ListCategory(c *gin.Context) {
 	categories, total, err := h.service.List(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (h *CategoryHandler) ListCategoryAvaragePrice(c *gin.Context) {
 	categoryAveragePrices, err := h.service.ListCategoryAvaragePrice(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -138,7 +138,7 @@ func (h *CategoryHandler) ListCategoryRevenue(c *gin.Context) {
 	stats, total, err := h.service.ListCategoryRevenue(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -179,7 +179,7 @@ func (h *CategoryHandler) GetCategoryStats(c *gin.Context) {
 	stats, err := h.widgetService.GetWidgetStats(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 

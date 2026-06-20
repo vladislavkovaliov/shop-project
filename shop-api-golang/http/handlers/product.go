@@ -49,7 +49,7 @@ func (h *ProductHandler) ListProducts(c *gin.Context) {
 	products, total, err := h.service.List(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (h *ProductHandler) ListCursorProducts(c *gin.Context) {
 	products, err := h.service.ListCursor(ctx, defaultCursor, defaultLimit)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -134,6 +134,7 @@ func (h *ProductHandler) ListCursorProducts(c *gin.Context) {
 //	@Tags			products
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			body	body	dto.CreateProductRequest	true	"Product data"
 //	@Success		201		{object}	dto.ProductResponse
 //	@Failure		400		{object}	map[string]string
@@ -192,7 +193,7 @@ func (h *ProductHandler) ListRevenueReport(c *gin.Context) {
 	totalRevenues, err := h.service.ListRevenueReport(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -230,7 +231,7 @@ func (h *ProductHandler) GetRevenueStats(c *gin.Context) {
 	revenueStats, err := h.service.GetRevenueStats(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 

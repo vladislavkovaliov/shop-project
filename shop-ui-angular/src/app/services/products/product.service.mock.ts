@@ -22,6 +22,18 @@ const MOCK_REVENUE: ProductRevenue[] = [
 
 @Injectable()
 export class MockProductService {
+  private nextId = 6;
+
+  createProduct(data: { title: string; price: number; category_id?: number }): Observable<Product> {
+    const newProduct: Product = {
+      id: this.nextId++,
+      title: data.title,
+      price: data.price,
+      category: 'Uncategorized',
+    };
+    MOCK_PRODUCTS.push(newProduct);
+    return of(newProduct);
+  }
   getProducts(page: number, pageSize: number): Observable<PaginatedResponse<Product>> {
     const start = page * pageSize;
     const items = MOCK_PRODUCTS.slice(start, start + pageSize);

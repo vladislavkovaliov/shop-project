@@ -163,12 +163,32 @@ describe('OrderService', () => {
   });
 
   describe('createOrder', () => {
-    it('should return order with id', () => {
-      let result: Order | undefined;
+    it('should POST to /api/orders with the request body', () => {
+      const payload = { user_id: 1, items: [{ product_id: 1, quantity: 2 }] };
+      service.createOrder(payload).subscribe();
+      const req = httpMock.expectOne('/api/orders');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush({ id: 1, items: [], user_id: 1, created_at: '2026-06-19T12:00:00Z' });
+    });
 
-      service.createOrder({}).subscribe(r => result = r);
+    it('should return the created order response', () => {
+      const payload = { user_id: 1, items: [{ product_id: 1, quantity: 2 }] };
+      const expected = { id: 1, items: [{ product_id: 1, title: 'Test', quantity: 2, price: 50 }], user_id: 1, created_at: '2026-06-19T12:00:00Z' };
+      let result: any;
+      service.createOrder(payload).subscribe(r => result = r);
+      httpMock.expectOne('/api/orders').flush(expected);
+      expect(result).toEqual(expected);
+    });
 
-      expect(result!.id).toBe('#NEW');
+    it('should propagate HTTP error', () => {
+      let error: unknown;
+      service.createOrder({ user_id: 0, items: [] }).subscribe({ error: e => error = e });
+      httpMock.expectOne('/api/orders').flush(
+        { error: 'invalid request' },
+        { status: 400, statusText: 'Bad Request' },
+      );
+      expect(error).toBeTruthy();
     });
   });
 });

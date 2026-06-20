@@ -85,7 +85,12 @@ export class Products {
   }
 
   protected openCreateProductDialog(): void {
-    this.dialog.open(CreateProductDialog);
+    const dialogRef = this.dialog.open(CreateProductDialog);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.productsResource.reload();
+      }
+    });
   }
 
   protected formatCurrency(value: number): string {

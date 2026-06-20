@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, of } from 'rxjs';
+import { map } from 'rxjs';
 import type { Observable } from 'rxjs';
 import type { User, UserWithPurchases } from '@app/models/user.types';
 import type { PaginatedResponse } from '@app/models/order.types';
-import type { DtoListUserResponse, DtoListUserWithTotalResponse } from 'src/lib/types/api';
+import type { DtoCreateUserRequest, DtoListUserResponse, DtoListUserWithTotalResponse, DtoUserResponse } from 'src/lib/types/api';
 import { mapUsers, mapUserWithPurchases } from './user.mapper';
 
 @Injectable()
@@ -39,5 +39,9 @@ export class UserService {
     return this.http.get<DtoListUserResponse>(UserService.getPremiumUsersUrl).pipe(
       map(response => mapUsers(response.data)),
     );
+  }
+
+  createUser(data: DtoCreateUserRequest): Observable<DtoUserResponse> {
+    return this.http.post<DtoUserResponse>(UserService.getUsersUrl, data);
   }
 }

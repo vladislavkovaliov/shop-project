@@ -43,10 +43,19 @@ app.use('/api', async (req, res) => {
   const apiUrl = process.env['API_URL'] || 'http://api:8080';
   const target = `${apiUrl}${req.originalUrl}`;
 
+  const rawBody = await new Promise<string>((resolve) => {
+    let body = '';
+    req.setEncoding('utf8');
+    req.on('data', (chunk: string) => (body += chunk));
+    req.on('end', () => resolve(body));
+    req.on('error', () => resolve(''));
+  });
+
   try {
     const response = await fetch(target, {
       method: req.method,
       headers: req.headers as Record<string, string>,
+      body: rawBody || undefined,
     });
 
     res.status(response.status);

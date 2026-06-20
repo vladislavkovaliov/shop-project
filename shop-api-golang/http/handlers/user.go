@@ -35,7 +35,7 @@ func (h *UserHandler) CountUser(c *gin.Context) {
 	total, err := h.service.Count(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -74,7 +74,7 @@ func (h *UserHandler) ListUsers(c *gin.Context) {
 	users, total, err := h.service.List(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (h *UserHandler) ListCursorUsers(c *gin.Context) {
 	users, err := h.service.ListCursor(ctx, defaultCursor, defaultLimit)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -181,7 +181,7 @@ func (h *UserHandler) Search(c *gin.Context) {
 	users, err := h.service.Search(ctx, field, value)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -218,7 +218,7 @@ func (h *UserHandler) ListTop3Users(c *gin.Context) {
 	top3Users, err := h.service.ListTop3Users(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -256,7 +256,7 @@ func (h *UserHandler) ListUserByMostExpensiveProduct(c *gin.Context) {
 	users, err := h.service.ListUserByMostExpensiveProduct(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -305,8 +305,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	user, err := h.service.Create(ctx, req.Name, req.Email)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-
+		internalError(c, err)
 		return
 	}
 
@@ -335,7 +334,7 @@ func (h *UserHandler) ListDailyUserRegistration(c *gin.Context) {
 	registrations, err := h.service.ListDailyUserRegistration(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -369,7 +368,7 @@ func (h *UserHandler) GetUserRegistrationTrend(c *gin.Context) {
 	userRegistrationTrend, err := h.service.GetUserRegistrationTrend(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 

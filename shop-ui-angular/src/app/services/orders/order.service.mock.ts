@@ -49,8 +49,15 @@ export class MockOrderService {
     return of({ totalThisMonth: 1240500, averageCheck: 4120, activeOrders: 42 });
   }
 
-  createOrder(payload: Record<string, unknown>): Observable<Order> {
-    console.log('MockOrderService.createOrder payload', payload);
-    return of({ id: '#NEW', userId: 0, createdAt: '' });
+  private nextIdCounter = 12460;
+
+  createOrder(data: { user_id: number; items?: Array<{ product_id: number; quantity: number }> }): Observable<Order> {
+    const newOrder: Order = {
+      id: String(this.nextIdCounter++),
+      userId: data.user_id,
+      createdAt: new Date().toISOString(),
+    };
+    MOCK_ORDERS.unshift(newOrder);
+    return of(newOrder);
   }
 }

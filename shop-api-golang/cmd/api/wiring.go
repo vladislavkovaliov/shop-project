@@ -38,12 +38,14 @@ func setupRouter(pool *pgxpool.Pool, producer *events.Producer, rabbitProducer *
 }
 
 func wireProducts(rg *gin.RouterGroup, pool *pgxpool.Pool) {
+	authMw := middleware.AuthMiddleware(pool)
+
 	repo := productrepo.NewPgxRepository(pool)
 	svc := productservice.New(repo)
 	h := handlers.NewProductHandler(svc)
 
 	rg.GET("/products", h.ListProducts)
-	rg.POST("/products", h.CreateProduct)
+	rg.POST("/products", authMw, h.CreateProduct)
 	rg.GET("/products/cursor", h.ListCursorProducts)
 	rg.GET("/products/revenue-report", h.ListRevenueReport)
 	rg.GET("/products/revenue-stats", h.GetRevenueStats)

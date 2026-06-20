@@ -36,7 +36,7 @@ func (h *OrderHandler) CountOrders(c *gin.Context) {
 	total, err := h.service.Count(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -62,21 +62,21 @@ func (h *OrderHandler) StatsOrder(c *gin.Context) {
 	total, err := h.service.Count(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
 	totalThisMonth, err := h.service.GetTotalThisMonth(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
 	averageCheck, err := h.service.GetAverageCheck(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func (h *OrderHandler) ListOrder(c *gin.Context) {
 	orders, total, err := h.service.List(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -154,7 +154,7 @@ func (h *OrderHandler) ListDailyPurchases(c *gin.Context) {
 	dailyPurchases, err := h.service.ListDailyPurchases(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -210,8 +210,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 	order, orderItems, err := h.service.Create(ctx, req.UserID, items)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-
+		internalError(c, err)
 		return
 	}
 
@@ -260,7 +259,7 @@ func (h *OrderHandler) GetOrderItems(c *gin.Context) {
 	orderItems, err := h.service.GetOrderItems(ctx, orderID)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -294,7 +293,7 @@ func (h *OrderHandler) GetOrdersTrend(c *gin.Context) {
 	ordersTrend, err := h.service.GetOrdersTrend(ctx)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 
@@ -338,7 +337,7 @@ func (h *OrderHandler) GetDailyStats(c *gin.Context) {
 	dailyStats, total, err := h.service.GetDailyStats(ctx, defaultLimit, defaultOffset)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		internalError(c, err)
 		return
 	}
 

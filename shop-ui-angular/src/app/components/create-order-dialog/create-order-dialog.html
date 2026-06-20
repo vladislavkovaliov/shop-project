@@ -1,5 +1,5 @@
 <div class="flex items-center justify-between px-6 pt-5 pb-2">
-  <h2 class="text-lg font-semibold m-0">New Order</h2>
+  <h2 class="text-lg font-semibold m-0">Create Order</h2>
   <button mat-icon-button (click)="cancel()">
     <mat-icon>close</mat-icon>
   </button>
@@ -8,36 +8,37 @@
 <mat-dialog-content [formGroup]="form">
   <mat-form-field appearance="outline" class="pt-2 w-full">
     <mat-label>User ID</mat-label>
-    <input matInput formControlName="userId" />
+    <input matInput type="number" formControlName="user_id" />
   </mat-form-field>
 
-  <h3 class="text-base font-medium text-zinc-800 mt-5 mb-3">Order Items</h3>
-
-  @for (item of itemControls; track $index) {
-    <div [formGroup]="item" class="flex gap-3 items-start mb-3">
-      <mat-form-field appearance="outline" class="flex-1">
-        <mat-label>Product ID</mat-label>
-        <input matInput formControlName="productId" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="w-24">
-        <mat-label>Qty</mat-label>
-        <input matInput type="number" formControlName="quantity" />
-      </mat-form-field>
-      @if (items.length > 1) {
-        <button mat-icon-button (click)="removeItem($index)" class="mt-2">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
+  <div formArrayName="items">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-zinc-700">Items</span>
+      <button mat-button type="button" (click)="addItem()">
+        <mat-icon class="!text-lg">add</mat-icon> Add Item
+      </button>
     </div>
-  }
-
-  <button mat-stroked-button (click)="addItem()" class="mt-2">
-    <mat-icon>add_circle</mat-icon>
-    Add Item
-  </button>
+    @for (item of items.controls; track $index) {
+      <div [formGroupName]="$index" class="flex gap-3 items-start mb-2">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Product ID</mat-label>
+          <input matInput type="number" formControlName="product_id" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-24">
+          <mat-label>Qty</mat-label>
+          <input matInput type="number" formControlName="quantity" />
+        </mat-form-field>
+        @if (items.controls.length > 1) {
+          <button mat-icon-button type="button" (click)="removeItem($index)" class="mt-2">
+            <mat-icon class="!text-lg text-red-500">delete</mat-icon>
+          </button>
+        }
+      </div>
+    }
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="pt-2">
   <button mat-button (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" (click)="submit()">Submit</button>
+  <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="submit()">Submit</button>
 </mat-dialog-actions>

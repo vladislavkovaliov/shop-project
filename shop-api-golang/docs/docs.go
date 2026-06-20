@@ -408,6 +408,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add a new product to the database",
                 "consumes": [
                     "application/json"

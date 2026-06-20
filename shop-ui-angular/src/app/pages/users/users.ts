@@ -3,7 +3,9 @@ import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, Ma
 import { MatPaginator, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { CreateUserDialog } from '@components/create-user-dialog/create-user-dialog';
 import { UserService } from '@app/services/users/user.service';
 
 function paginatorIntlFactory(): MatPaginatorIntl {
@@ -27,7 +29,7 @@ function paginatorIntlFactory(): MatPaginatorIntl {
   imports: [
     MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
-    MatPaginator, MatButton, MatIcon,
+    MatPaginator, MatButton, MatIcon, MatDialogModule,
   ],
   templateUrl: './users.html',
   styleUrl: './users.css',
@@ -36,6 +38,7 @@ function paginatorIntlFactory(): MatPaginatorIntl {
   ],
 })
 export class Users {
+  private dialog = inject(MatDialog);
   private userService = inject(UserService);
 
   protected readonly displayedColumns = ['id', 'name', 'email', 'actions'];
@@ -61,6 +64,15 @@ export class Users {
   protected onPage(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
+  }
+
+  protected openCreateUserDialog(): void {
+    const dialogRef = this.dialog.open(CreateUserDialog);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.usersResource.reload();
+      }
+    });
   }
 
   protected formatCurrency(value: number): string {

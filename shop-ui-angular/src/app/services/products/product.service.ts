@@ -4,7 +4,7 @@ import { map } from 'rxjs';
 import type { Observable } from 'rxjs';
 import type { Product, ProductRevenue, RevenueStats } from '@app/models/product.types';
 import type { PaginatedResponse } from '@app/models/order.types';
-import type { DtoListProductResponse, DtoListRevenueReportResponse, DtoRevenueStatsResponse } from 'src/lib/types/api';
+import type { DtoCreateProductRequest, DtoListProductResponse, DtoListRevenueReportResponse, DtoProductResponse, DtoRevenueStatsResponse } from 'src/lib/types/api';
 import { mapProducts, mapProductRevenue } from './product.mapper';
 
 @Injectable()
@@ -12,6 +12,7 @@ export class ProductService {
   private http = inject(HttpClient);
 
   static getProductsUrl = '/api/products';
+  static getCreateProductUrl = '/api/products';
   static getRevenueUrl = '/api/products/revenue-report';
   static getRevenueStatsUrl = '/api/products/revenue-stats';
 
@@ -45,5 +46,9 @@ export class ProductService {
 
   getRevenueStats(): Observable<RevenueStats> {
     return this.http.get<DtoRevenueStatsResponse>(ProductService.getRevenueStatsUrl);
+  }
+
+  createProduct(data: DtoCreateProductRequest): Observable<DtoProductResponse> {
+    return this.http.post<DtoProductResponse>(ProductService.getCreateProductUrl, data);
   }
 }

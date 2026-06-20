@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
@@ -11,6 +12,7 @@ import { AuthService } from '@app/services/auth/auth.service';
 export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   email = '';
   password = '';
@@ -39,6 +41,18 @@ export class Login {
       await this.router.navigate(['/']);
     } catch {
       this.error = 'An unexpected error occurred';
+    }
+  }
+
+  async ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    await this.authService.init();
+
+    if (this.authService.session()) {
+      await this.router.navigate(['/']);
     }
   }
 }

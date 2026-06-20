@@ -35,6 +35,7 @@ const MOCK_PREMIUM: User[] = [
 
 @Injectable()
 export class MockUserService {
+  private nextId = 16;
   getUsers(page: number, pageSize: number): Observable<PaginatedResponse<User>> {
     const start = page * pageSize;
     const items = MOCK_USERS.slice(start, start + pageSize);
@@ -47,5 +48,15 @@ export class MockUserService {
 
   getPremiumUsers(): Observable<User[]> {
     return of(MOCK_PREMIUM);
+  }
+
+  createUser(data: { name: string; email: string }): Observable<User> {
+    const newUser: User = {
+      id: this.nextId++,
+      name: data.name,
+      email: data.email,
+    };
+    MOCK_USERS.push(newUser);
+    return of(newUser);
   }
 }
