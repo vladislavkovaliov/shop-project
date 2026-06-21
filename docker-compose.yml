@@ -82,6 +82,7 @@ services:
       - "4000"
     environment:
       PORT: "4000"
+      ALLOWED_HOSTS: "*"
       DATABASE_URL: postgres://postgres:password@postgres:5432/shop?sslmode=disable
       AUTH_SECRET: fd589bf745dd7796d65a5fb7d5a18e5069bf58de5070cda1c7569ab087635359
     depends_on:
