@@ -20,6 +20,13 @@ type PaginatedUsersResponse {
   hasMore: Boolean!
 }
 
+type CursorUserResponse {
+  users: [User!]!
+  nextCursor: Int!
+}
+
 type Query {
   users(limit: Int! = 10, offset: Int! = 0): PaginatedUsersResponse!
+  usersCursor(cursor: Int! = 0, limit: Int! = 10): CursorUserResponse!
+  usersCount: Int!
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { take } from 'rxjs';
 
 @Injectable()
 export class UserRepository {
@@ -15,5 +16,19 @@ export class UserRepository {
       skip: offset,
       take: limit,
     });
+  }
+
+  async findWithCursor(cursor = 0, limit = 10): Promise<User[]> {
+    const result = await this.userRepository.find({
+      where: cursor > 0 ? { id: MoreThan(cursor) } : {},
+      take: limit,
+      order: { id: 'ASC' },
+    });
+
+    return result;
+  }
+
+  async count(): Promise<number> {
+    return this.userRepository.count();
   }
 }

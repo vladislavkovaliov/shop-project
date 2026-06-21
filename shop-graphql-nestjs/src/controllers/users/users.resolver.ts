@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { PaginatedUsersResponse } from './dto/paginated-users-response';
 import { AuthGuard } from '../../guards/auth.guard'
 import { UseGuards } from '@nestjs/common';
+import { CursorUserResponse } from './dto/cursor-user-response';
 
 @Resolver(() => User)
 @UseGuards(AuthGuard)
@@ -17,4 +18,26 @@ export class UsersResolver {
   ): Promise<PaginatedUsersResponse> {
     return this.userService.findWithCount(limit, offset);
   }
+
+  @Query(() => CursorUserResponse)
+  async usersCursor(
+    @Args('cursor', { type: () => Int, defaultValue: 0 }) cursor: number,
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
+  ): Promise<CursorUserResponse> {
+    const users = await this.userService.findWithCursor(cursor, limit);
+
+    const nextCursor = users[users.length - 1].id;
+
+    return {
+      users: users,
+      nextCursor: nextCursor,
+    };
+  }
+
+  @Query(() => Int)
+  async usersCount(): Promise<number> {
+    return this.userService.count()
+  }
+
+  
 }
