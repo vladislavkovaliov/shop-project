@@ -43,6 +43,57 @@ type DailyUserRegistrationResponse {
   count: Int!
 }
 
+type Order {
+  id: Int!
+  userId: Int!
+  createdAt: DateTime!
+}
+
+type OrderItemResponse {
+  productId: Int!
+  title: String!
+  quantity: Int!
+  price: Float!
+}
+
+type DailyPurchasesResponse {
+  orderDate: DateTime!
+  purchases: Int!
+}
+
+type StatsOrderResponse {
+  total: Int!
+  totalThisMonth: Float!
+  averageCheck: Float!
+}
+
+type GrowthResponse {
+  value: Float!
+  sign: String!
+}
+
+type OrdersTrendResponse {
+  currentPeriod: Int!
+  previousPeriod: Int!
+  growth: GrowthResponse!
+}
+
+type PaginatedOrdersResponse {
+  items: [Order!]!
+  total: Int!
+}
+
+type DailyStatsResponse {
+  date: DateTime!
+  orders: Int!
+  revenue: Float!
+}
+
+type PaginatedDailyStatsResponse {
+  items: [DailyStatsResponse!]!
+  total: Int!
+}
+
 type Query {
   users(limit: Int! = 10, offset: Int! = 0): PaginatedUsersResponse!
   usersCursor(cursor: Int! = 0, limit: Int! = 10): CursorUserResponse!
@@ -51,4 +102,11 @@ type Query {
   top3Users: [UserWithTotalSpentResponse!]!
   usersByMostExpensiveProduct: [User!]!
   dailyRegistrations: [DailyUserRegistrationResponse!]!
+  orderCount: Int!
+  ordersTrend: OrdersTrendResponse!
+  orderStats: StatsOrderResponse!
+  orders(limit: Int! = 10, offset: Int! = 0): PaginatedOrdersResponse!
+  orderItems(orderId: Int!): [OrderItemResponse!]!
+  dailyPurchases: [DailyPurchasesResponse!]!
+  dailyStats(limit: Int! = 10, offset: Int! = 0): PaginatedDailyStatsResponse!
 }
