@@ -49,16 +49,7 @@ export class UserRepository {
   }
 
   async findTop3ByTotalSpent(): Promise<UserWithTotalSpentResponse[]> {
-    const rows = await this.dataSource.query(`
-      SELECT u.id, u.name, u.email, u.created_at, SUM(oi.quantity * p.price) AS total_spent
-      FROM users u
-      JOIN orders o ON o.user_id = u.id
-      JOIN order_items oi ON oi.order_id = o.id
-      JOIN products p ON p.id = oi.product_id
-      GROUP BY u.id, u.name, u.email, u.created_at
-      ORDER BY total_spent DESC
-      LIMIT 3
-    `);
+    const rows = await this.dataSource.query(`SELECT id, name, email, total_spent FROM user_total_spent LIMIT 3`);
 
     return rows.map(r => {
       return {

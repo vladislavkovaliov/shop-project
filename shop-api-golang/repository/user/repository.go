@@ -96,20 +96,7 @@ func (r *PgxRepository) List(ctx context.Context, limit int, offset int) ([]*use
 }
 
 func (r *PgxRepository) ListTop3Users(ctx context.Context) ([]*userdomain.UserWithTotalSpent, error) {
-	rows, err := r.pool.Query(ctx, `
-		SELECT 
-			o.user_id,
-			u.name,
-			u.email,
-			SUM(oi.quantity * p.price) AS total_spent
-		FROM orders o
-		JOIN order_items oi on o.id = oi.order_id
-		JOIN products p ON oi.product_id = p.id
-		JOIN users u ON u.id = o.user_id
-		GROUP BY o.user_id, u.name, u.email
-		ORDER BY total_spent DESC
-		LIMIT 3
-	`)
+	rows, err := r.pool.Query(ctx, `SELECT id, name, email, total_spent FROM user_total_spent LIMIT 3`)
 
 	if err != nil {
 		return nil, err

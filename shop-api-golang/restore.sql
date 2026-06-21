@@ -10680,6 +10680,15 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE VIEW user_total_spent AS
+SELECT u.id, u.name, u.email, u.created_at,
+    COALESCE(SUM(oi.quantity * p.price), 0) AS total_spent
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+LEFT JOIN order_items oi ON oi.order_id = o.id
+LEFT JOIN products p ON p.id = oi.product_id
+GROUP BY u.id, u.name, u.email, u.created_at;
+
 --
 -- PostgreSQL database dump complete
 --
