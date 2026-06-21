@@ -40,27 +40,10 @@ export class UserRepository {
 
   async searchByField(field: 'name' | 'email', value: string): Promise<User[]> {
     const LIMIT = 10; // INFO: not need to return all
-
-    let _where = {};
-
-    switch(field) {
-      case 'name': {
-        _where = { name: ILike(`%${value}%`) };
-        break;
-      }
-      case 'email':{
-        _where = { email: ILike(`%${value}%`) };
-        break;
-      }
-      default: {
-        _where = {};
-      }
-    }
     
-    const users = await this.userRepository.find({
-      where: _where,
-      take: LIMIT
-    });
+    const users = await this.userRepository.query(`
+      SELECT id, name, email FROM search_users_by_field('${field}', '${value}') LIMIT ${LIMIT}  
+    `)
 
     return users;
   }

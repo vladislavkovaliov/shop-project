@@ -47,7 +47,7 @@ export class UserService {
   async getRegistrationTrend(): Promise<UserRegistrationTrendRespose> {
     const { currentPeriod, previousPeriod } = await this.usersRepository.getRegistrationTrend();
 
-    const rawGrowth = previousPeriod > 0 ? ((currentPeriod / previousPeriod) / previousPeriod) * 100 : 0;
+    const rawGrowth = previousPeriod > 0 ? ((currentPeriod - previousPeriod) / previousPeriod) * 100 : 0;
 
     const value = Math.round(Math.abs(rawGrowth) * 10) / 10;
 

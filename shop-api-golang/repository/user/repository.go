@@ -203,22 +203,13 @@ func (r *PgxRepository) ListDailyUserRegistration(ctx context.Context) ([]*userd
 }
 
 func (r *PgxRepository) Search(ctx context.Context, field string, value string) ([]*userdomain.User, error) {
-	col, ok := allowedFields[field]
+	_, ok := allowedFields[field]
 
 	if !ok {
 		return nil, fmt.Errorf("invalid search field: %s", field)
 	}
 
-	var query string
-
-	switch col {
-	case "name":
-		query = "SELECT id, name, email FROM users WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)"
-	case "email":
-		query = "SELECT id, name, email FROM users WHERE email ILIKE '%' || $1 || '%'"
-	}
-
-	rows, err := r.pool.Query(ctx, query, value)
+	rows, err := r.pool.Query(ctx, "SELECT id, name, email FROM search_users_by_field($1, $2)", field, value)
 
 	if err != nil {
 		return nil, err

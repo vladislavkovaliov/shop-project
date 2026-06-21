@@ -10654,6 +10654,32 @@ CREATE TABLE IF NOT EXISTS "verification" (
 
 CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
 
+
+CREATE OR REPLACE FUNCTION search_users_by_field(
+    p_field TEXT,
+    p_value TEXT
+) RETURNS TABLE(id INT, name TEXT, email TEXT, created_at TIMESTAMP)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF p_field = 'name' THEN
+        RETURN QUERY
+        SELECT u.id, u.name, u.email, u.created_at
+        FROM users u
+        WHERE to_tsvector('english', u.name) @@ plainto_tsquery('english', p_value)
+        LIMIT 10;
+    ELSIF p_field = 'email' THEN
+        RETURN QUERY
+        SELECT u.id, u.name, u.email, u.created_at
+        FROM users u
+        WHERE u.email ILIKE '%' || p_value || '%'
+        LIMIT 10;
+    ELSE
+        RAISE EXCEPTION 'invalid search field: %', p_field;
+    END IF;
+END;
+$$;
+
 --
 -- PostgreSQL database dump complete
 --
