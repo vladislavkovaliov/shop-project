@@ -72,7 +72,7 @@ export class UserRepository {
     `);
 
     return rows.map(r => {
-      return { 
+      return {
         id: r.id,
         name: r.name, 
         email: r.email, 
