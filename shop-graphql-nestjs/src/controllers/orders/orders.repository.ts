@@ -31,10 +31,7 @@ export class OrdersRepository {
 
   async getOrderItems(orderId: number): Promise<OrderItemResponse[]> {
     const rows = await this.dataSource.query(
-      `SELECT oi.product_id, p.title, p.price, oi.quantity
-       FROM order_items oi
-       JOIN products p ON p.id = oi.product_id
-       WHERE oi.order_id = $1`,
+      `SELECT * FROM get_order_items_by_order_id($1)`,
       [orderId],
     );
 

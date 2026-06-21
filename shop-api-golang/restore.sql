@@ -10654,6 +10654,7 @@ CREATE TABLE IF NOT EXISTS "verification" (
 
 CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
 
+-- FUNCTION DEFINITIONS
 
 CREATE OR REPLACE FUNCTION search_users_by_field(
     p_field TEXT,
@@ -10679,6 +10680,24 @@ BEGIN
     END IF;
 END;
 $$;
+
+
+CREATE OR REPLACE FUNCTION get_order_items_by_order_id(
+    p_value BIGINT
+) RETURNS TABLE(product_id BIGINT, title TEXT, price NUMERIC(10, 2), quantity INTEGER)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY 
+    SELECT oi.product_id, p.title, p.price, oi.quantity
+    FROM order_items oi
+    JOIN products p ON p.id = oi.product_id
+    WHERE oi.order_id = p_value;
+END;
+$$;
+
+
+-- VIEW DEFINITIONS
 
 CREATE OR REPLACE VIEW user_total_spent AS
 SELECT u.id, u.name, u.email, u.created_at,
