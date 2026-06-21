@@ -14,6 +14,7 @@ import { DailyUserRegistrationResponse } from './dto/daily-user-registration-res
 export class UsersResolver {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(AuthGuard)
   @Query(() => PaginatedUsersResponse)
   async users(
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
@@ -22,6 +23,7 @@ export class UsersResolver {
     return this.userService.findWithCount(limit, offset);
   }
 
+  @UseGuards(AuthGuard)
   @Query(() => CursorUserResponse)
   async usersCursor(
     @Args('cursor', { type: () => Int, defaultValue: 0 }) cursor: number,
@@ -37,11 +39,13 @@ export class UsersResolver {
     };
   }
 
+  @UseGuards(AuthGuard)
   @Query(() => Int)
   async usersCount(): Promise<number> {
     return this.userService.count()
   }
 
+  @UseGuards(AuthGuard)
   @Query(() => SearchResponse)
   async searchUsers(
     @Args('field', { type: () => String }) field: string,

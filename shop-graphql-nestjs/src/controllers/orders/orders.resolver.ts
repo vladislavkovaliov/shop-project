@@ -15,11 +15,13 @@ import { PaginatedDailyStatsResponse } from './dto/paginated-daily-stats-respons
 export class OrdersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(AuthGuard)
   @Query(() => Int)
   async orderCount(): Promise<number> {
     return this.ordersService.count();
   }
 
+  @UseGuards(AuthGuard)
   @Query(() => OrdersTrendResponse)
   async ordersTrend(): Promise<OrdersTrendResponse> {
     return this.ordersService.getOrdersTrend();
@@ -29,7 +31,7 @@ export class OrdersResolver {
   @Query(() => StatsOrderResponse)
   async orderStats(): Promise<StatsOrderResponse> {
     const stats = await this.ordersService.getStats();
-    
+
     return stats;
   }
 
