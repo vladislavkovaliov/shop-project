@@ -6,5 +6,5 @@ export class GrowthResponse {
     value: number;
 
     @Field()
-    sign: number;
+    sign: string;
 }

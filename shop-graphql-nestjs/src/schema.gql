@@ -25,8 +25,30 @@ type CursorUserResponse {
   nextCursor: Int!
 }
 
+type SearchResponse {
+  items: [User!]!
+  total: Int!
+}
+
+type UserWithTotalSpentResponse {
+  id: Int!
+  name: String!
+  email: String!
+  createdAt: DateTime!
+  totalSpent: Float!
+}
+
+type DailyUserRegistrationResponse {
+  createdAt: DateTime!
+  count: Int!
+}
+
 type Query {
   users(limit: Int! = 10, offset: Int! = 0): PaginatedUsersResponse!
   usersCursor(cursor: Int! = 0, limit: Int! = 10): CursorUserResponse!
   usersCount: Int!
+  searchUsers(field: String!, value: String!): SearchResponse!
+  top3Users: [UserWithTotalSpentResponse!]!
+  usersByMostExpensiveProduct: [User!]!
+  dailyRegistrations: [DailyUserRegistrationResponse!]!
 }

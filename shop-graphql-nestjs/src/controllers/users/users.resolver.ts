@@ -5,6 +5,9 @@ import { PaginatedUsersResponse } from './dto/paginated-users-response';
 import { AuthGuard } from '../../guards/auth.guard'
 import { UseGuards } from '@nestjs/common';
 import { CursorUserResponse } from './dto/cursor-user-response';
+import { SearchResponse } from './dto/search-response';
+import { UserWithTotalSpentResponse } from './dto/user-with-total-spent-response';
+import { DailyUserRegistrationResponse } from './dto/daily-user-registration-response';
 
 @Resolver(() => User)
 @UseGuards(AuthGuard)
@@ -39,5 +42,29 @@ export class UsersResolver {
     return this.userService.count()
   }
 
-  
+  @Query(() => SearchResponse)
+  async searchUsers(
+    @Args('field', { type: () => String }) field: string,
+    @Args('value', { type: () => String }) value: string,
+  ): Promise<SearchResponse> {
+    return this.userService.searchByField(field, value);
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => [UserWithTotalSpentResponse])
+  async top3Users(): Promise<UserWithTotalSpentResponse[]> {
+    return this.userService.findTop3TotalSpent();
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => [User])
+  async usersByMostExpensiveProduct(): Promise<User[]> {
+    return this.userService.findByMostExpensiveProduct();
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => [DailyUserRegistrationResponse])
+  async dailyRegistrations(): Promise<DailyUserRegistrationResponse[]> {
+    return this.userService.findDailyRegistrations();
+  }
 }
