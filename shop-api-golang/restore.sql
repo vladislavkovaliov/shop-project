@@ -10656,8 +10656,6 @@ CREATE TABLE IF NOT EXISTS "verification" (
 
 CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
 
-SELECT pg_catalog.set_config('search_path', '', false);
-
 -- FUNCTION DEFINITIONS
 
 CREATE OR REPLACE FUNCTION search_users_by_field(
@@ -10711,6 +10709,8 @@ LEFT JOIN orders o ON o.user_id = u.id
 LEFT JOIN order_items oi ON oi.order_id = o.id
 LEFT JOIN products p ON p.id = oi.product_id
 GROUP BY u.id, u.name, u.email, u.created_at;
+
+SELECT pg_catalog.set_config('search_path', '', false);
 
 --
 -- PostgreSQL database dump complete
