@@ -10602,6 +10602,8 @@ ALTER TABLE ONLY public.orders
 -- Auth tables for Better Auth (SSR-side authentication)
 --
 
+SELECT pg_catalog.set_config('search_path', 'public', false);
+
 CREATE TABLE IF NOT EXISTS "user" (
     "id" TEXT PRIMARY KEY,
     "name" TEXT NOT NULL,
@@ -10653,6 +10655,8 @@ CREATE TABLE IF NOT EXISTS "verification" (
 );
 
 CREATE INDEX IF NOT EXISTS "verification_identifier_idx" ON "verification"("identifier");
+
+SELECT pg_catalog.set_config('search_path', '', false);
 
 -- FUNCTION DEFINITIONS
 
