@@ -1,8 +1,9 @@
 # shop-project — monorepo
 
-Содержит два подпроекта:
+Содержит три подпроекта:
 - `shop-ui-angular/` — Angular 21.2 frontend + SSR (Express)
 - `shop-api-golang/` — Go backend (SQL workshop)
+- `shop-graphql-nestjs/` — NestJS GraphQL API (Apollo + TypeORM)
 
 ---
 
@@ -167,6 +168,102 @@ shop-api-golang/
 | Run directly | `go run ./cmd/api/main.go` |
 | Regenerate swagger | `swag init -g ./cmd/api/main.go` |
 | Run tests | `go test ./...` |
+
+---
+
+## shop-graphql-nestjs
+
+NestJS GraphQL API (Apollo + TypeORM + PostgreSQL). Module: `shop-graphql-nestjs`.
+
+### Structure
+
+```
+shop-graphql-nestjs/
+  src/
+    main.ts                     — entry point
+    app.module.ts               — root module, GraphQL + TypeORM config
+    schema.gql                  — auto-generated GraphQL schema
+    auth/                       — Better Auth session entity + module
+    guards/
+      auth.guard.ts             — GraphQL auth guard (reads cookie/session)
+      current-user.decorator.ts — @CurrentUser() param decorator
+    controllers/
+      users/                    — user queries + mutations
+        users.module.ts
+        users.resolver.ts
+        users.service.ts
+        users.repository.ts
+        entities/user.entity.ts
+        dto/
+      orders/                   — order queries
+        orders.module.ts
+        orders.resolver.ts
+        orders.service.ts
+        orders.repository.ts
+        entities/order.entity.ts
+        dto/
+```
+
+### Key conventions
+
+- **Standalone modules** — no shared module, each feature registers its own TypeORM entities.
+- **Repository pattern** — TypeORM for simple queries (`find`, `count`), `@InjectDataSource()` + raw SQL for complex joins.
+- **Auth** — `@UseGuards(AuthGuard)` per-method on protected queries. Public queries have no guard.
+- **GrowthResponse** DTO shared between users and orders via import from `users/dto/`.
+- **PostgreSQL functions/views** — shared between Go and NestJS via `shop-api-golang/restore.sql` (mounted to postgres container).
+
+### Commands
+
+| Action | Command |
+|--------|---------|
+| Build | `npm run build` |
+| Dev | `npm run start:dev` |
+| Test | `npm test` |
+
+---
+
+## tools/review
+
+Go CLI для code review и работы с SQL. Собирается в `tools/review/review`.
+
+### Structure
+
+```
+tools/review/
+  main.go              — dispatcher: review | sql, flags: --model, --ollama-url, --help
+  review.go            — code review: git diff → Ollama
+  sql.go               — sql extract: find duplicate SQL → Ollama → DDL
+  internal/
+    git/diff.go        — git diff --cached for .ts files
+    llm/ollama.go      — Ollama API client (chat, no streaming)
+    report/writer.go   — formatted terminal output
+    sql/
+      scanner.go       — extract SQL blocks from .go and .repository.ts
+      matcher.go       — normalize, hash, group duplicates
+      extract.go       — scan → match → Ollama → print DDL
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `./review` | Review staged changes in shop-graphql-nestjs/ |
+| `./review sql` | Find duplicate SQL between Go and NestJS, suggest extraction |
+| `./review --help` | Show help |
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--model <name>` | `deepseek-coder:6.7b` | Ollama model |
+| `--ollama-url <url>` | `http://192.168.1.85:11434` | Ollama server |
+
+### sql extract flow
+
+1. Scan `shop-api-golang/repository/*.go` and `shop-graphql-nestjs/src/**/*.repository.ts` for SQL in backtick strings
+2. Normalize (lowercase, collapse whitespace, `$N` → `?`), hash, group by hash
+3. Filter out already-extracted SQL (function calls, view calls)
+4. For each cross-project duplicate: show files + SQL → ask `[y/N]` → if yes, send to Ollama → print `CREATE OR REPLACE FUNCTION` DDL to terminal
 
 ---
 

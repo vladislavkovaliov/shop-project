@@ -1,67 +1,82 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
-	"time"
+)
 
-	"github.com/vladislavkovaliov/shop-project/tools/review/internal/git"
-	"github.com/vladislavkovaliov/shop-project/tools/review/internal/llm"
-	"github.com/vladislavkovaliov/shop-project/tools/review/internal/report"
+type Config struct {
+	Model     string
+	OllamaURL string
+}
+
+const (
+	defaultModel     = "deepseek-coder:6.7b"
+	defaultOllamaURL = "http://192.168.1.85:11434"
 )
 
 func main() {
-	URL := "http://192.168.1.85:11434"
+	cfg, cmd, showHelp := parseConfig(os.Args[1:])
 
-	model := flag.String("model", "deepseek-coder:6.7b", "Ollama model name")
-	ollamaURL := flag.String("ollama-url", URL, "Ollama server URL")
-	flag.Parse()
-
-	log.SetPrefix("")
-	log.SetFlags(log.Ltime | log.Lmicroseconds)
-
-	log.Printf("🚀 review tool started")
+	if showHelp {
+		printHelp()
+		return
+	}
 
 	repoRoot := findRepoRoot()
-	log.Printf("  repo root: %s", repoRoot)
 
-	if git.IsClean(repoRoot) {
-		report.PrintNoChanges()
-		return
+	switch cmd {
+	case "sql":
+		runSQL(repoRoot, cfg)
+	default:
+		runReview(repoRoot, cfg)
+	}
+}
+
+func parseConfig(args []string) (cfg Config, cmd string, help bool) {
+	cfg = Config{
+		Model:     defaultModel,
+		OllamaURL: defaultOllamaURL,
 	}
 
-	startTotal := time.Now()
-
-	result, err := git.GetStagedDiff(repoRoot)
-	if err != nil {
-		report.PrintError(fmt.Sprintf("git diff failed: %v", err))
-		os.Exit(1)
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--model":
+			if i+1 < len(args) {
+				i++
+				cfg.Model = args[i]
+			}
+		case "--ollama-url":
+			if i+1 < len(args) {
+				i++
+				cfg.OllamaURL = args[i]
+			}
+		case "-h", "--help":
+			help = true
+			return
+		default:
+			if !strings.HasPrefix(args[i], "-") && cmd == "" {
+				cmd = args[i]
+			}
+		}
 	}
 
-	if len(result.Files) == 0 {
-		report.PrintNoChanges()
-		return
-	}
+	return
+}
 
-	report.PrintHeader(result.Files)
-
-	client := llm.NewClient(*ollamaURL, *model)
-
-	log.Printf("  sending to ollama...")
-	review, err := client.Review(result.Diff, "", "")
-	if err != nil {
-		report.PrintError(fmt.Sprintf("LLM review failed: %v", err))
-		os.Exit(1)
-	}
-
-	totalElapsed := time.Since(startTotal).Round(time.Millisecond)
-	log.Printf("  total time: %v", totalElapsed)
-
-	report.PrintReview(*model, review)
+func printHelp() {
+	fmt.Println()
+	fmt.Println("  usage:")
+	fmt.Println("    review [flags]                   review staged changes")
+	fmt.Println("    review sql [flags]               find duplicate SQL between Go and NestJS")
+	fmt.Println()
+	fmt.Println("  flags:")
+	fmt.Printf("    --model <name>       Ollama model (default: %s)\n", defaultModel)
+	fmt.Printf("    --ollama-url <url>   Ollama server URL (default: %s)\n", defaultOllamaURL)
+	fmt.Println("    -h, --help           show this help")
+	fmt.Println()
 }
 
 func findRepoRoot() string {

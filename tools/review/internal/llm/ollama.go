@@ -47,9 +47,7 @@ func NewClient(baseURL, model string) *Client {
 	}
 }
 
-func (c *Client) Review(diff, lintErrors, tscErrors string) (string, error) {
-	log.Printf("  building prompt...")
-	prompt := buildPrompt(diff, lintErrors, tscErrors)
+func (c *Client) Send(prompt string) (string, error) {
 	log.Printf("  prompt size: %d characters", len(prompt))
 
 	body := ChatRequest{
@@ -96,6 +94,12 @@ func (c *Client) Review(diff, lintErrors, tscErrors string) (string, error) {
 	log.Printf("  response size: %d characters", answerSize)
 
 	return chatResp.Message.Content, nil
+}
+
+func (c *Client) Review(diff, lintErrors, tscErrors string) (string, error) {
+	log.Printf("  building prompt...")
+	prompt := buildPrompt(diff, lintErrors, tscErrors)
+	return c.Send(prompt)
 }
 
 func buildPrompt(diff, lint, tsc string) string {
