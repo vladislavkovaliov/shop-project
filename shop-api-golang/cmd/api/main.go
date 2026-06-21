@@ -1,7 +1,6 @@
 // @title			Shop API
 // @version		1.0
 // @description	Educational SQL workshop backend API
-// @host			localhost:8080
 // @BasePath		/api
 //
 // @securityDefinitions.apikey	BearerAuth
