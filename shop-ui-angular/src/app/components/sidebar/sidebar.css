@@ -12,3 +12,13 @@ a.active {
   border-left: 2px solid #3b82f6;
   padding-left: 22px;
 }
+
+button[mat-button].user-button {
+  color: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+}
+
+button[mat-button].user-button:hover {
+  background: #f4f4f5;
+}

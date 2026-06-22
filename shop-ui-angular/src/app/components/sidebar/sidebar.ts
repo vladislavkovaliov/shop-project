@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MatMenuModule } from '@angular/material/menu';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 interface MenuItem {
   icon: string;
@@ -10,7 +12,7 @@ interface MenuItem {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [MatIcon, RouterLink, RouterLinkActive],
+  imports: [MatIcon, MatMenuModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -22,4 +24,13 @@ export class SidebarComponent {
     { icon: 'group', label: 'Users', path: '/users' },
   ];
 
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  protected user = this.authService.session;
+
+  protected async signOut() {
+    await this.authService.signOut();
+    await this.router.navigate(['/login']);
+  }
 }
